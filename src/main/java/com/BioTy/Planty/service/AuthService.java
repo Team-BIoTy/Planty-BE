@@ -5,6 +5,7 @@ import com.BioTy.Planty.dto.user.LoginResponseDto;
 import com.BioTy.Planty.dto.user.SignupRequestDto;
 import com.BioTy.Planty.entity.User;
 import com.BioTy.Planty.repository.UserRepository;
+import com.BioTy.Planty.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     // 1. 회원가입 메서드
     public void signup(SignupRequestDto signupRequestDto) {
@@ -35,7 +37,7 @@ public class AuthService {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
-        String token = "";
+        String token = jwtUtil.generateToken(user.getEmail());
         return new LoginResponseDto(token);
     }
 
