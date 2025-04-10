@@ -1,5 +1,7 @@
 package com.BioTy.Planty.service;
 
+import com.BioTy.Planty.dto.user.LoginRequestDto;
+import com.BioTy.Planty.dto.user.LoginResponseDto;
 import com.BioTy.Planty.dto.user.SignupRequestDto;
 import com.BioTy.Planty.entity.User;
 import com.BioTy.Planty.repository.UserRepository;
@@ -24,4 +26,17 @@ public class AuthService {
 
         userRepository.save(user);
     }
+
+    // 2. 로그인 메서드
+    public LoginResponseDto login(LoginRequestDto loginRequestDto){
+        User user = userRepository.findByEmail(loginRequestDto.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("가입되지 않은 이메일입니다."));
+        if (!passwordEncoder.matches(loginRequestDto.getPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        String token = "";
+        return new LoginResponseDto(token);
+    }
+
 }

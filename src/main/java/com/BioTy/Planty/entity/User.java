@@ -21,7 +21,6 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Getter(AccessLevel.NONE)
     @Column(nullable = false)
     private String password;
 
