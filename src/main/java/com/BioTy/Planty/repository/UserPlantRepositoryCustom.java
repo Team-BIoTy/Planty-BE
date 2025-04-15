@@ -1,9 +1,9 @@
 package com.BioTy.Planty.repository;
 
-import com.BioTy.Planty.entity.UserPlant;
+import com.BioTy.Planty.dto.userPlant.UserPlantSummaryResponseDto;
 
 import java.util.List;
 
 public interface UserPlantRepositoryCustom {
-    List<UserPlant> findAllWithLatestStatusAndPersonalityByUserId(Long userId);
+    List<UserPlantSummaryResponseDto> findSummaryDtoByUserId(Long userId);
 }
