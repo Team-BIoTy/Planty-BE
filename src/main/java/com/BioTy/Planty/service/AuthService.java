@@ -41,4 +41,12 @@ public class AuthService {
         return new LoginResponseDto(token);
     }
 
+    // 3. 토큰 → userId 추출
+    public Long getUserIdFromToken(String token) {
+        String email = jwtUtil.getEmailFromToken(token);
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."))
+                .getId();
+    }
+
 }
