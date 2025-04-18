@@ -1,12 +1,3 @@
----
-name: pr-feat-template
-about: PR 시 사용
-title: "[Feat] #이슈번호 추가기능"
-labels: Feat
-assignees: ghi512
-
----
-
 ### Pull Request
 PR 내용 요약
 
