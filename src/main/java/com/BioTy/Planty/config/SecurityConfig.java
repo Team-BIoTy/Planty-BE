@@ -17,7 +17,18 @@ public class SecurityConfig {
         httpSecurity
                 .csrf().disable()
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/signup", "/auth/login", "/auth/validate").permitAll()
+                        .requestMatchers(
+                                "/auth/signup",
+                                "/auth/login",
+                                "/auth/validate",
+                                "/user-plants",
+
+                                // Swagger 경로들
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-resources/**",
+                                "/webjars/**"
+                        ).permitAll()
                         .anyRequest().authenticated());
         return httpSecurity.build();
     }
