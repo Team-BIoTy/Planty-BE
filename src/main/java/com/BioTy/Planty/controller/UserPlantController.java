@@ -1,5 +1,6 @@
 package com.BioTy.Planty.controller;
 
+import com.BioTy.Planty.dto.iot.RegisterDeviceRequestDto;
 import com.BioTy.Planty.dto.userPlant.UserPlantCreateRequestDto;
 import com.BioTy.Planty.dto.userPlant.UserPlantSummaryResponseDto;
 import com.BioTy.Planty.service.AuthService;
@@ -39,11 +40,11 @@ public class UserPlantController {
     }
 
     // 사용자 식물 등록
-    @PostMapping
     @Operation(
             summary = "반려식물 등록",
             description = "사용자가 선택한 식물 정보(도감), 애칭, 입양일, 성격을 입력하여 반려식물을 등록합니다.",
             security = @SecurityRequirement(name = "bearerAuth"))
+    @PostMapping
     public ResponseEntity<Long> registerUserPlant(
             @Parameter(hidden = true)
             @RequestHeader("Authorization") String token,
@@ -54,5 +55,20 @@ public class UserPlantController {
 
         Long userPlantId = userPlantService.registerUserPlant(requestDto, userId);
         return ResponseEntity.ok(userPlantId);
+    }
+
+    // iot 기기 등록
+    @Operation(
+            summary = "IoT 기기 연결",
+            description = "사용자의 반려식물과 IoT 기기를 연결합니다.",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @PostMapping("/{userPlantId}/device")
+    public ResponseEntity<Void> registerIotDevice(
+            @Parameter(description = "반려식물 ID") @PathVariable Long userPlantId,
+            @RequestBody RegisterDeviceRequestDto requestDto
+    ){
+        userPlantService.registerDevice(userPlantId, requestDto.getIotDeviceId());
+        return ResponseEntity.ok().build();
     }
 }

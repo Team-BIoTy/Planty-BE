@@ -38,6 +38,10 @@ public class UserPlant {
     @OneToMany(mappedBy = "userPlant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PlantStatus> statuses = new ArrayList<>();
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "iot_device_id")
+    private IotDevice iotDevice;
+
     public PlantStatus getLatestStatus(){
         return statuses.stream()
                 .max(Comparator.comparing(PlantStatus::getCheckedAt))
@@ -52,5 +56,9 @@ public class UserPlant {
         this.adoptedAt = adoptedAt;
         this.personality = personality;
         this.plantInfo = plantInfo;
+    }
+
+    public void setIotDevice(IotDevice iotDevice){
+        this.iotDevice = iotDevice;
     }
 }

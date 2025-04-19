@@ -3,14 +3,8 @@ package com.BioTy.Planty.service;
 import com.BioTy.Planty.dto.userPlant.PersonalityResponseDto;
 import com.BioTy.Planty.dto.userPlant.UserPlantCreateRequestDto;
 import com.BioTy.Planty.dto.userPlant.UserPlantSummaryResponseDto;
-import com.BioTy.Planty.entity.Personality;
-import com.BioTy.Planty.entity.PlantInfo;
-import com.BioTy.Planty.entity.User;
-import com.BioTy.Planty.entity.UserPlant;
-import com.BioTy.Planty.repository.PersonalityRepository;
-import com.BioTy.Planty.repository.PlantInfoRepository;
-import com.BioTy.Planty.repository.UserPlantRepository;
-import com.BioTy.Planty.repository.UserRepository;
+import com.BioTy.Planty.entity.*;
+import com.BioTy.Planty.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +18,7 @@ public class UserPlantService {
     private final UserRepository userRepository;
     private final PlantInfoRepository plantInfoRepository;
     private final PersonalityRepository personalityRepository;
+    private final IotDeviceRepository iotDeviceRepository;
 
     // 사용자 반려식물 목록 조회
     public List<UserPlantSummaryResponseDto> getUserPlants(Long userId){
@@ -64,5 +59,16 @@ public class UserPlantService {
                         p.getExampleComment()
                 ))
                 .toList();
+    }
+
+    // 반려식물에 IoT 기기 등록
+    @Transactional
+    public void registerDevice(Long userPlantId, Long iotDeviceId){
+        UserPlant userPlant = userPlantRepository.findById(userPlantId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 반려식물이 존재하지 않습니다."));
+        IotDevice iotDevice = iotDeviceRepository.findById(iotDeviceId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 IoT 기기가 존재하지 않습니다."));
+
+        userPlant.setIotDevice(iotDevice);
     }
 }
