@@ -23,6 +23,7 @@ public class SecurityConfig {
                                 "/auth/validate",
                                 "/user-plants",
                                 "/plants",
+                                "/plants/{plnatId}",
 
                                 // Swagger 경로들
                                 "/swagger-ui/**",

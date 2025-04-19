@@ -1,5 +1,6 @@
 package com.BioTy.Planty.controller;
 
+import com.BioTy.Planty.dto.plant.PlantInfoDetailResponseDto;
 import com.BioTy.Planty.dto.plant.PlantInfoListResponseDto;
 import com.BioTy.Planty.service.PlantInfoService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -8,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,5 +27,11 @@ public class PlantInfoController {
     public ResponseEntity<List<PlantInfoListResponseDto>> getAllPlants(){
         List<PlantInfoListResponseDto> response = plantInfoService.getAllPlantInfoLists();
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "도감 식물 상세 정보 조회", description = "선택한 식물의 상세 정보를 조회합니다.")
+    @GetMapping("/{plantId}")
+    public PlantInfoDetailResponseDto getPlantDetail(@PathVariable Long plantId) {
+        return plantInfoService.getPlantInfoDetail(plantId);
     }
 }
