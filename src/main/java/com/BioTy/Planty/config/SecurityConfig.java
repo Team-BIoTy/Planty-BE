@@ -22,6 +22,7 @@ public class SecurityConfig {
                                 "/auth/login",
                                 "/auth/validate",
                                 "/user-plants",
+                                "/personalities",
                                 "/plants",
                                 "/plants/{plnatId}",
 

@@ -1,5 +1,6 @@
 package com.BioTy.Planty.service;
 
+import com.BioTy.Planty.dto.userPlant.PersonalityResponseDto;
 import com.BioTy.Planty.dto.userPlant.UserPlantCreateRequestDto;
 import com.BioTy.Planty.dto.userPlant.UserPlantSummaryResponseDto;
 import com.BioTy.Planty.entity.Personality;
@@ -24,10 +25,12 @@ public class UserPlantService {
     private final PlantInfoRepository plantInfoRepository;
     private final PersonalityRepository personalityRepository;
 
+    // 사용자 반려식물 목록 조회
     public List<UserPlantSummaryResponseDto> getUserPlants(Long userId){
         return userPlantRepository.findSummaryDtoByUserId(userId);
     }
 
+    // 반려식물 등록
     @Transactional
     public Long registerUserPlant(UserPlantCreateRequestDto requestDto, Long userId){
         User user = userRepository.findById(userId)
@@ -48,5 +51,18 @@ public class UserPlantService {
 
         userPlantRepository.save(userPlant);
         return userPlant.getId();
+    }
+
+    // 성격 조회
+    public List<PersonalityResponseDto> getAllPersonalities(){
+        return personalityRepository.findAll().stream()
+                .map(p -> new PersonalityResponseDto(
+                        p.getId(),
+                        p.getLabel(),
+                        p.getEmoji(),
+                        p.getDescription(),
+                        p.getExampleComment()
+                ))
+                .toList();
     }
 }
