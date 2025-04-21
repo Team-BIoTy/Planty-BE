@@ -17,7 +17,7 @@ public class UserPlantRepositoryImpl implements UserPlantRepositoryCustom {
     @Override
     public List<UserPlantSummaryResponseDto> findSummaryDtoByUserId(Long userId) {
         String sql = """
-            SELECT 
+            SELECT\s
               up.id AS userPlantId,
               up.nickname,
               up.image_url AS imageUrl,
@@ -32,12 +32,12 @@ public class UserPlantRepositoryImpl implements UserPlantRepositoryCustom {
             FROM user_plant up
             LEFT JOIN personality p ON up.personality_id = p.id
             LEFT JOIN plant_status ps ON ps.user_plant_id = up.id
+                AND ps.checked_at = (
+                    SELECT MAX(inner_ps.checked_at)
+                    FROM plant_status inner_ps
+                    WHERE inner_ps.user_plant_id = up.id
+                )
             WHERE up.user_id = ?1
-              AND ps.checked_at = (
-                  SELECT MAX(inner_ps.checked_at)
-                  FROM plant_status inner_ps
-                  WHERE inner_ps.user_plant_id = up.id
-              )
         """;
 
         List<Object[]> rows = em.createNativeQuery(sql)
