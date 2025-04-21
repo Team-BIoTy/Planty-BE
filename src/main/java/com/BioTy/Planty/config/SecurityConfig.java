@@ -26,6 +26,7 @@ public class SecurityConfig {
                                 "/personalities",
                                 "/plants",
                                 "/plants/{plnatId}",
+                                "/iot-devices",
 
                                 // Swagger 경로들
                                 "/swagger-ui/**",

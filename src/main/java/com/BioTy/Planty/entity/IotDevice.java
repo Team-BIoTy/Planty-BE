@@ -23,5 +23,9 @@ public class IotDevice {
     @OneToOne(mappedBy = "iotDevice")
     private UserPlant userPlant;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
     private LocalDateTime lastOnline;
 }
