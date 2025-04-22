@@ -2,6 +2,7 @@ package com.BioTy.Planty.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -30,8 +31,16 @@ public class UserPlant {
     @JoinColumn(name = "personality_id", nullable = false)
     private Personality personality;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "plant_info_id", nullable = false)
+    private PlantInfo plantInfo;
+
     @OneToMany(mappedBy = "userPlant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PlantStatus> statuses = new ArrayList<>();
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "iot_device_id")
+    private IotDevice iotDevice;
 
     public PlantStatus getLatestStatus(){
         return statuses.stream()
@@ -39,11 +48,17 @@ public class UserPlant {
                 .orElse(null);
     }
 
-    public UserPlant(User user, String nickname, String imageUrl, LocalDate adoptedAt, Personality personality){
+    @Builder
+    public UserPlant(User user, String nickname, String imageUrl, LocalDate adoptedAt, Personality personality, PlantInfo plantInfo){
         this.user = user;
         this.nickname = nickname;
         this.imageUrl = imageUrl;
         this.adoptedAt = adoptedAt;
         this.personality = personality;
+        this.plantInfo = plantInfo;
+    }
+
+    public void setIotDevice(IotDevice iotDevice){
+        this.iotDevice = iotDevice;
     }
 }

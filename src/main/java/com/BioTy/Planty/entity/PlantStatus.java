@@ -27,7 +27,7 @@ public class PlantStatus {
     private LocalDateTime checkedAt;
 
     public PlantStatus(UserPlant userPlant, Integer temperatureScore, Integer humidityScore,
-                       Integer lightScore, Integer waterScore, String statusMessage, LocalDateTime checkedAt) {
+                       Integer lightScore, String statusMessage, LocalDateTime checkedAt) {
         this.userPlant = userPlant;
         this.temperatureScore = temperatureScore;
         this.lightScore = lightScore;

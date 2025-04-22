@@ -22,6 +22,11 @@ public class SecurityConfig {
                                 "/auth/login",
                                 "/auth/validate",
                                 "/user-plants",
+                                "/user-plants/{userPlantId}/device",
+                                "/personalities",
+                                "/plants",
+                                "/plants/{plnatId}",
+                                "/iot-devices",
 
                                 // Swagger 경로들
                                 "/swagger-ui/**",

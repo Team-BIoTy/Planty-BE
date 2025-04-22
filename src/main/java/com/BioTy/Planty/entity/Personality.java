@@ -19,6 +19,8 @@ public class Personality {
     private String label;
     private String emoji;
     private String color;
+    private String description;
+    private String exampleComment;
 
     public Personality(String label, String emoji, String color){
         this.label = label;
