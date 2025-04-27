@@ -9,6 +9,7 @@ public class PersonalityResponseDto {
     private Long id;
     private String label;
     private String emoji;
+    private String color;
     private String description;
     private String exampleComment;
 }

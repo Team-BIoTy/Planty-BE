@@ -55,6 +55,7 @@ public class UserPlantService {
                         p.getId(),
                         p.getLabel(),
                         p.getEmoji(),
+                        p.getColor(),
                         p.getDescription(),
                         p.getExampleComment()
                 ))
