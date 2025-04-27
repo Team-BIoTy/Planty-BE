@@ -2,6 +2,7 @@ package com.BioTy.Planty.controller;
 
 import com.BioTy.Planty.dto.iot.RegisterDeviceRequestDto;
 import com.BioTy.Planty.dto.userPlant.UserPlantCreateRequestDto;
+import com.BioTy.Planty.dto.userPlant.UserPlantDetailResponseDto;
 import com.BioTy.Planty.dto.userPlant.UserPlantSummaryResponseDto;
 import com.BioTy.Planty.service.AuthService;
 import com.BioTy.Planty.service.UserPlantService;
@@ -70,5 +71,14 @@ public class UserPlantController {
     ){
         userPlantService.registerDevice(userPlantId, requestDto.getIotDeviceId());
         return ResponseEntity.ok().build();
+    }
+
+    // 반려식물 상세 정보 조회
+    @Operation(
+            summary = "반려식물 상세 조회",
+            description = "userPlantId를 이용해 반려식물의 상세 정보를 조회합니다.")
+    @GetMapping("/{userPlantId}")
+    public UserPlantDetailResponseDto getUserPlantDetail(@PathVariable Long userPlantId) {
+        return userPlantService.getUserPlantDetail(userPlantId);
     }
 }
