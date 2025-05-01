@@ -2,6 +2,7 @@ package com.BioTy.Planty.service;
 
 import com.BioTy.Planty.dto.userPlant.PersonalityResponseDto;
 import com.BioTy.Planty.dto.userPlant.UserPlantCreateRequestDto;
+import com.BioTy.Planty.dto.userPlant.UserPlantDetailResponseDto;
 import com.BioTy.Planty.dto.userPlant.UserPlantSummaryResponseDto;
 import com.BioTy.Planty.entity.*;
 import com.BioTy.Planty.repository.*;
@@ -55,6 +56,7 @@ public class UserPlantService {
                         p.getId(),
                         p.getLabel(),
                         p.getEmoji(),
+                        p.getColor(),
                         p.getDescription(),
                         p.getExampleComment()
                 ))
@@ -70,5 +72,11 @@ public class UserPlantService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 IoT 기기가 존재하지 않습니다."));
 
         userPlant.setIotDevice(iotDevice);
+    }
+
+    // 반려식물 상세 정보 조회
+    @Transactional
+    public UserPlantDetailResponseDto getUserPlantDetail(Long userPlantId) {
+        return userPlantRepository.findDetailDtoByUserPlantId(userPlantId);
     }
 }
