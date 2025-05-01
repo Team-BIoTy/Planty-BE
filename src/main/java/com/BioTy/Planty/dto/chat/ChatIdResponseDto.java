@@ -1,4 +1,4 @@
-package com.BioTy.Planty.dto.chatbot;
+package com.BioTy.Planty.dto.chat;
 
 public class ChatIdResponseDto {
     private Long chatRoomId;
