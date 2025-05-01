@@ -46,7 +46,7 @@ public class ChatService {
         ChatMessage userMsg = chatMessageRepository.save(new ChatMessage(chatRoomId, ChatMessage.Sender.USER, message));
 
         // AI 서버와 통신해서 응답 받아오기 (TODO)
-        String botReply = "temp"; // 임시
+        String botReply = "테스트 응답입니다"; // 임시
 
         // 챗봇 메시지 저장
         ChatMessage botMsg = chatMessageRepository.save(new ChatMessage(chatRoomId, ChatMessage.Sender.BOT, botReply));
