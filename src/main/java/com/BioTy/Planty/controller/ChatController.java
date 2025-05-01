@@ -1,0 +1,70 @@
+package com.BioTy.Planty.controller;
+
+import com.BioTy.Planty.dto.chat.ChatIdResponseDto;
+import com.BioTy.Planty.dto.chat.ChatMessageResponseDto;
+import com.BioTy.Planty.dto.chat.SendMessageRequestDto;
+import com.BioTy.Planty.dto.chat.StartChatRequestDto;
+import com.BioTy.Planty.service.AuthService;
+import com.BioTy.Planty.service.ChatService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/chats")
+@RequiredArgsConstructor
+@Tag(name = "ChatController", description = "식물 챗봇 관련 API")
+public class ChatController {
+    private final ChatService chatService;
+    private final AuthService authService;
+
+    @PostMapping
+    @Operation(
+            summary = "채팅방 생성",
+            description = "userPlantId가 null이면 일반 식물 챗봇, 아니면 반려식물 챗봇으로 연결",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    public ResponseEntity<ChatIdResponseDto> startCht(
+            @Parameter(hidden = true)
+            @RequestHeader("Authorization") String token,
+            @RequestBody StartChatRequestDto request
+    ){
+        token = token.replace("Bearer ", "");
+        Long userId = authService.getUserIdFromToken(token);
+
+        ChatIdResponseDto chatRoomId = chatService.startChat(userId, request.getUserPlantId());
+        return ResponseEntity.ok(chatRoomId);
+    }
+
+    @GetMapping("/{chatRoomId}/messages")
+    @Operation(
+            summary = "채팅 메시지 목록 조회",
+            description = "특정 채팅방의 전체 대화 메시지를 시간순으로 조회",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    public ResponseEntity<List<ChatMessageResponseDto>> getMessages(@PathVariable Long chatRoomId){
+        List<ChatMessageResponseDto> messages = chatService.getMessages(chatRoomId);
+        return ResponseEntity.ok(messages);
+    }
+
+    @PostMapping("/{chatRoomId}/messages")
+    @Operation(
+            summary = "채팅 메시지 전송",
+            description = "사용자 메시지를 전송하면 챗봇 응답까지 함께 반환",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    public ResponseEntity<ChatMessageResponseDto> sendMessage(
+            @PathVariable Long chatRoomId,
+            @RequestBody SendMessageRequestDto request
+            ){
+        ChatMessageResponseDto response = chatService.sendMessage(chatRoomId, request.getMessage());
+        return ResponseEntity.ok(response);
+    }
+}
