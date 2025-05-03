@@ -1,9 +1,6 @@
 package com.BioTy.Planty.controller;
 
-import com.BioTy.Planty.dto.chat.ChatIdResponseDto;
-import com.BioTy.Planty.dto.chat.ChatMessageResponseDto;
-import com.BioTy.Planty.dto.chat.SendMessageRequestDto;
-import com.BioTy.Planty.dto.chat.StartChatRequestDto;
+import com.BioTy.Planty.dto.chat.*;
 import com.BioTy.Planty.service.AuthService;
 import com.BioTy.Planty.service.ChatService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,7 +8,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,6 +37,23 @@ public class ChatController {
 
         ChatIdResponseDto chatRoomId = chatService.startChat(userId, request.getUserPlantId());
         return ResponseEntity.ok(chatRoomId);
+    }
+
+    @GetMapping
+    @Operation(
+            summary = "채팅방 목록 조회",
+            description = "사용자의 전체 채팅방 목록을 조회",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    public ResponseEntity<List<ChatRoomSummaryDto>> getChatRooms(
+            @Parameter(hidden = true)
+            @RequestHeader("Authorization") String token
+    ){
+        token = token.replace("Bearer ", "");
+        Long userId = authService.getUserIdFromToken(token);
+
+        List<ChatRoomSummaryDto> chatRooms = chatService.getChatRooms(userId);
+        return ResponseEntity.ok(chatRooms);
     }
 
     @GetMapping("/{chatRoomId}/messages")

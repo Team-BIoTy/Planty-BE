@@ -2,6 +2,7 @@ package com.BioTy.Planty.service;
 
 import com.BioTy.Planty.dto.chat.ChatIdResponseDto;
 import com.BioTy.Planty.dto.chat.ChatMessageResponseDto;
+import com.BioTy.Planty.dto.chat.ChatRoomSummaryDto;
 import com.BioTy.Planty.entity.ChatMessage;
 import com.BioTy.Planty.entity.ChatRoom;
 import com.BioTy.Planty.repository.ChatMessageRepository;
@@ -30,7 +31,36 @@ public class ChatService {
         return new ChatIdResponseDto(chatRoom.getId());
     }
 
-    // 2. 메시지 리스트 조회
+    // 2. 채팅방 목록 조회
+    @Transactional(readOnly = false)
+    public List<ChatRoomSummaryDto> getChatRooms(Long userId){
+        List<ChatRoom> rooms =
+                chatRoomRepository.findAllByUserIdOrderByLastSentAtDesc(userId);
+
+        return rooms.stream().map(room -> {
+            ChatMessage lastMsg = chatMessageRepository
+                    .findTopByChatRoomIdOrderByTimestampDesc(room.getId())
+                    .orElse(null);
+
+            String nickname = room.getUserPlant() != null
+                    ? room.getUserPlant().getNickname()
+                    : "식물챗봇";
+
+            String imageUrl = room.getUserPlant() != null
+                    ? room.getUserPlant().getImageUrl()
+                    : "";
+
+            return new ChatRoomSummaryDto(
+                    room.getId(),
+                    nickname,
+                    lastMsg != null ? lastMsg.getMessage() : "(아직 메시지 없음)",
+                    lastMsg != null ? lastMsg.getTimestamp() : room.getLastSentAt(),
+                    imageUrl
+            );
+        }).collect(Collectors.toList());
+    }
+
+    // 3. 메시지 리스트 조회
     public List<ChatMessageResponseDto> getMessages(Long chatRoomId){
         return chatMessageRepository.findByChatRoomIdOrderByTimestampAsc(chatRoomId).stream()
                 .map(msg -> new ChatMessageResponseDto(
@@ -42,7 +72,7 @@ public class ChatService {
     }
 
 
-    // 3. 메시지 전송
+    // 4. 메시지 전송
     public ChatMessageResponseDto sendMessage(Long chatRoomId, String message) {
         // 1) 사용자 메시지 저장
         ChatMessage userMsg = chatMessageRepository.save(
