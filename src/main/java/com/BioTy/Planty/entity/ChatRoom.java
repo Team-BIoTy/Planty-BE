@@ -17,11 +17,19 @@ public class ChatRoom {
     private Long id;
     private Long userId;
     private Long userPlantId; // 일반 식물 챗봇일 경우 null
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime lastSentAt;
 
-    public ChatRoom(Long userId, Long userPlantId, LocalDateTime createdAt) {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userPlantId", referencedColumnName = "id", insertable = false, updatable = false)
+    private UserPlant userPlant; // 읽기 전용
+
+    public ChatRoom(Long userId, Long userPlantId, LocalDateTime now) {
         this.userId = userId;
         this.userPlantId = userPlantId;
-        this.createdAt = createdAt;
+        this.lastSentAt = now;
+    }
+
+    public void updateLastSentAt(LocalDateTime time) {
+        this.lastSentAt = time;
     }
 }
