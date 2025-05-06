@@ -2,9 +2,11 @@ package com.BioTy.Planty.service;
 
 import com.BioTy.Planty.dto.chat.ChatIdResponseDto;
 import com.BioTy.Planty.dto.chat.ChatMessageResponseDto;
+import com.BioTy.Planty.dto.chat.ChatRoomDetailDto;
 import com.BioTy.Planty.dto.chat.ChatRoomSummaryDto;
 import com.BioTy.Planty.entity.ChatMessage;
 import com.BioTy.Planty.entity.ChatRoom;
+import com.BioTy.Planty.entity.UserPlant;
 import com.BioTy.Planty.repository.ChatMessageRepository;
 import com.BioTy.Planty.repository.ChatRoomRepository;
 import lombok.RequiredArgsConstructor;
@@ -71,8 +73,40 @@ public class ChatService {
                 .collect(Collectors.toList());
     }
 
+    // 4. 채팅방 상세 조회 (반려식물 정보 + 메시지)
+    public ChatRoomDetailDto getChatRoomDetail(Long chatRoomId) {
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
 
-    // 4. 메시지 전송
+        UserPlant userPlant = chatRoom.getUserPlant(); // null일 수 있음
+
+        String nickname = userPlant != null ? userPlant.getNickname() : "식물 챗봇";
+        String imageUrl = userPlant != null ? userPlant.getImageUrl() : null;
+        String personalityLabel = userPlant != null ? userPlant.getPersonality().getLabel() : null;
+        String personalityEmoji = userPlant != null ? userPlant.getPersonality().getEmoji() : null;
+        String personalityColor = userPlant != null ? userPlant.getPersonality().getColor() : null;
+
+        List<ChatMessageResponseDto> messages = chatMessageRepository.findByChatRoomIdOrderByTimestampAsc(chatRoomId).stream()
+                .map(msg -> new ChatMessageResponseDto(
+                        msg.getSender().name(),
+                        msg.getMessage(),
+                        msg.getTimestamp()
+                ))
+                .collect(Collectors.toList());
+
+        return new ChatRoomDetailDto(
+                chatRoomId,
+                nickname,
+                imageUrl,
+                personalityLabel,
+                personalityEmoji,
+                personalityColor,
+                messages
+        );
+    }
+
+
+    // 5. 메시지 전송
     public ChatMessageResponseDto sendMessage(Long chatRoomId, String message) {
         // 1) 사용자 메시지 저장
         ChatMessage userMsg = chatMessageRepository.save(

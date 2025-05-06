@@ -29,6 +29,7 @@ public class SecurityConfig {
                                 "/plants/{plnatId}",
                                 "/iot-devices",
                                 "/chats",
+                                "/chats/{chatRoomId}",
                                 "/chats/{chatRoomId}/messages",
 
                                 // Swagger 경로들
