@@ -56,16 +56,6 @@ public class ChatController {
         return ResponseEntity.ok(chatRooms);
     }
 
-    @GetMapping("/{chatRoomId}/messages")
-    @Operation(
-            summary = "채팅 메시지 목록 조회",
-            description = "특정 채팅방의 전체 대화 메시지를 시간순으로 조회",
-            security = @SecurityRequirement(name = "bearerAuth")
-    )
-    public ResponseEntity<List<ChatMessageResponseDto>> getMessages(@PathVariable Long chatRoomId){
-        List<ChatMessageResponseDto> messages = chatService.getMessages(chatRoomId);
-        return ResponseEntity.ok(messages);
-    }
 
     @GetMapping("/{chatRoomId}")
     @Operation(

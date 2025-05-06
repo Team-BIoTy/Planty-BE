@@ -62,18 +62,7 @@ public class ChatService {
         }).collect(Collectors.toList());
     }
 
-    // 3. 메시지 리스트 조회
-    public List<ChatMessageResponseDto> getMessages(Long chatRoomId){
-        return chatMessageRepository.findByChatRoomIdOrderByTimestampAsc(chatRoomId).stream()
-                .map(msg -> new ChatMessageResponseDto(
-                        msg.getSender().name(),
-                        msg.getMessage(),
-                        msg.getTimestamp()
-                ))
-                .collect(Collectors.toList());
-    }
-
-    // 4. 채팅방 상세 조회 (반려식물 정보 + 메시지)
+    // 3. 채팅방 상세 조회 (반려식물 정보 + 메시지)
     public ChatRoomDetailDto getChatRoomDetail(Long chatRoomId) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new IllegalArgumentException("채팅방을 찾을 수 없습니다."));
@@ -106,7 +95,7 @@ public class ChatService {
     }
 
 
-    // 5. 메시지 전송
+    // 4. 메시지 전송
     public ChatMessageResponseDto sendMessage(Long chatRoomId, String message) {
         // 1) 사용자 메시지 저장
         ChatMessage userMsg = chatMessageRepository.save(
