@@ -48,6 +48,18 @@ public class IotController {
     }
 
     @Operation(
+            summary = "IoT 센서 데이터 수동 수신",
+            description = "선택한 IoT 기기의 센서 데이터를 Adafruit에서 수신하여 sensor_logs에 저장합니다."
+    )
+    @PostMapping("/sensor-data")
+    public ResponseEntity<Void> fetchSensorData(
+        @RequestParam Long deviceId
+    ){
+        iotService.fetchAndSaveSensorLog(deviceId);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(
             summary = "IoT 액션 명령 전송",
             description = "선택한 반려식물의 IoT 장치에 명령(WATER, FAN, LIGHT)을 전송합니다.",
             security = @SecurityRequirement(name = "bearerAuth")
