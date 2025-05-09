@@ -18,19 +18,12 @@ public class SecurityConfig {
                 .csrf().disable()
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/auth/signup",
-                                "/auth/login",
-                                "/auth/validate",
-                                "/user-plants",
-                                "/user-plants/{userPlantId}",
-                                "/user-plants/{userPlantId}/device",
+                                "/auth/**",
+                                "/user-plants/**",
                                 "/personalities",
-                                "/plants",
-                                "/plants/{plnatId}",
-                                "/iot",
-                                "/chats",
-                                "/chats/{chatRoomId}",
-                                "/chats/{chatRoomId}/messages",
+                                "/plants/**",
+                                "/iot/**",
+                                "/chats/**",
 
                                 // Swagger 경로들
                                 "/swagger-ui/**",
