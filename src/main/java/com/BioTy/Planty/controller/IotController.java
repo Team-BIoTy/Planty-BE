@@ -1,5 +1,6 @@
 package com.BioTy.Planty.controller;
 
+import com.BioTy.Planty.dto.iot.ActionRequestDto;
 import com.BioTy.Planty.dto.iot.IotDeviceResponseDto;
 import com.BioTy.Planty.entity.IotDevice;
 import com.BioTy.Planty.service.AuthService;
@@ -10,12 +11,11 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.parameters.P;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 @Tag(name = "Iot", description = "사용자의 IoT 기기 관련 API")
@@ -45,5 +45,23 @@ public class IotController {
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "IoT 액션 명령 전송",
+            description = "선택한 반려식물의 IoT 장치에 명령(WATER, FAN, LIGHT)을 전송합니다.",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @PostMapping("/{userPlantId}/actions")
+    public ResponseEntity<Void> sendActionToAdafruit(
+            @Parameter(description = "반려식물 ID") @PathVariable Long userPlantId,
+            @RequestBody ActionRequestDto request,
+            @Parameter(hidden = true) @RequestHeader("Authorization") String token
+    ) {
+        token = token.replace("Bearer ", "");
+        Long userId = authService.getUserIdFromToken(token);
+
+        iotService.sendAction(userPlantId, userId, request.getType());
+        return ResponseEntity.ok().build();
     }
 }

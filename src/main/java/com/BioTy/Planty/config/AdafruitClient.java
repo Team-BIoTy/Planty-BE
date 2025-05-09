@@ -26,7 +26,7 @@ public class AdafruitClient {
     private final RestTemplate restTemplate;
 
     public void sendCommand(String feedKey){
-        String url = String.format("%s/api/v2/%s/feeds/%s", baseUrl, username, feedKey);
+        String url = String.format("%s/api/v2/%s/feeds/%s/data", baseUrl, username, feedKey);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
