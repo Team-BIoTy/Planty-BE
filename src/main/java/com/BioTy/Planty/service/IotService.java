@@ -57,7 +57,7 @@ public class IotService {
                 .withZoneSameInstant(ZoneId.of("Asia/Seoul"))
                 .toLocalDateTime();
 
-        SensorLogs logs = new SensorLogs(device,lightVal, temperatureVal, humidityVal, recordedAt);
+        SensorLogs logs = new SensorLogs(device, temperatureVal, humidityVal, lightVal, recordedAt);
         sensorLogsRepository.save(logs);
     }
 
