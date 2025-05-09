@@ -3,7 +3,7 @@ package com.BioTy.Planty.controller;
 import com.BioTy.Planty.dto.iot.IotDeviceResponseDto;
 import com.BioTy.Planty.entity.IotDevice;
 import com.BioTy.Planty.service.AuthService;
-import com.BioTy.Planty.service.IotDeviceService;
+import com.BioTy.Planty.service.IotService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -18,12 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Tag(name = "IotDevice", description = "사용자의 IoT 기기 API")
+@Tag(name = "Iot", description = "사용자의 IoT 기기 관련 API")
 @RestController
-@RequestMapping("/iot-devices")
+@RequestMapping("/iot")
 @RequiredArgsConstructor
-public class IotDeviceController {
-    private final IotDeviceService iotDeviceService;
+public class IotController {
+    private final IotService iotService;
     private final AuthService authService;
 
     @Operation(
@@ -38,7 +38,7 @@ public class IotDeviceController {
     ) {
         token = token.replace("Bearer ", "");
         Long userId = authService.getUserIdFromToken(token);
-        List<IotDevice> devices = iotDeviceService.getDevicesByUserId(userId);
+        List<IotDevice> devices = iotService.getDevicesByUserId(userId);
 
         List<IotDeviceResponseDto> response = devices.stream()
                 .map(IotDeviceResponseDto::from)

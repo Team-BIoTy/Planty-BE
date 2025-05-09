@@ -27,7 +27,7 @@ public class SecurityConfig {
                                 "/personalities",
                                 "/plants",
                                 "/plants/{plnatId}",
-                                "/iot-devices",
+                                "/iot",
                                 "/chats",
                                 "/chats/{chatRoomId}",
                                 "/chats/{chatRoomId}/messages",
