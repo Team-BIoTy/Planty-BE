@@ -27,6 +27,10 @@ public class UserPlant {
     private String imageUrl;
     private LocalDate adoptedAt;
 
+    @Builder.Default
+    @Column(nullable = false)
+    private boolean autoControlEnabled = true;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "personality_id", nullable = false)
     private Personality personality;
@@ -49,13 +53,15 @@ public class UserPlant {
     }
 
     @Builder
-    public UserPlant(User user, String nickname, String imageUrl, LocalDate adoptedAt, Personality personality, PlantInfo plantInfo){
+    public UserPlant(User user, String nickname, String imageUrl, LocalDate adoptedAt,
+                     Personality personality, PlantInfo plantInfo, boolean autoControlEnabled){
         this.user = user;
         this.nickname = nickname;
         this.imageUrl = imageUrl;
         this.adoptedAt = adoptedAt;
         this.personality = personality;
         this.plantInfo = plantInfo;
+        this.autoControlEnabled = autoControlEnabled;
     }
 
     public void setIotDevice(IotDevice iotDevice){
