@@ -6,7 +6,6 @@ import com.BioTy.Planty.entity.UserPlant;
 import com.BioTy.Planty.repository.DeviceActionLogRepository;
 import com.BioTy.Planty.repository.DeviceCommandRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -19,11 +18,11 @@ public class DeviceCommandService {
     private final DeviceCommandRepository commandRepository;
     private final DeviceActionLogRepository actionLogRepository;
 
-    public void sendActions(UserPlant userPlant, List<String> actionTypes) {
+    public void executeCommands(UserPlant userPlant, List<String> actionTypes) {
         for (String action : actionTypes) {
             try {
                 // 1. 명령 전송
-                iotService.sendAction(userPlant.getId(), userPlant.getUser().getId(), action);
+                iotService.sendCommandToAdafruit(userPlant.getId(), userPlant.getUser().getId(), action);
 
                 // 2. 전송한 명령 기록 (device_command)
                 DeviceCommand command = DeviceCommand.builder()

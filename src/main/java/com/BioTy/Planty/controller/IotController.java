@@ -11,11 +11,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 @Tag(name = "Iot", description = "사용자의 IoT 기기 관련 API")
@@ -73,7 +71,7 @@ public class IotController {
         token = token.replace("Bearer ", "");
         Long userId = authService.getUserIdFromToken(token);
 
-        iotService.sendAction(userPlantId, userId, request.getType());
+        iotService.sendCommandToAdafruit(userPlantId, userId, request.getType());
         return ResponseEntity.ok().build();
     }
 }

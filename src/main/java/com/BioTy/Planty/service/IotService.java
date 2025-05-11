@@ -60,7 +60,7 @@ public class IotService {
         sensorLogsRepository.save(logs);
     }
 
-    public void sendAction(Long userPlantId, Long userId, String actionType) {
+    public void sendCommandToAdafruit(Long userPlantId, Long userId, String actionType) {
         UserPlant userPlant = userPlantRepository.findById(userPlantId)
                 .orElseThrow(() -> new RuntimeException("반려식물이 존재하지 않습니다."));
 

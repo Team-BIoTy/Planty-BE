@@ -45,7 +45,7 @@ public class PlantStatusService {
 
         // 4. 자동제어 여부에 따라 분기 처리
         if (actionNeeded && userPlant.isAutoControlEnabled()) {
-            deviceCommandService.sendActions(userPlant, actionTypes);
+            deviceCommandService.executeCommands(userPlant, actionTypes);
         }
 
         // 5. 상태 저장 (actionNeeded는 자동제어 OFF이고 기준 미달일 때만 true)
