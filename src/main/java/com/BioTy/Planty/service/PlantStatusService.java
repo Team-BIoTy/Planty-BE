@@ -21,7 +21,7 @@ public class PlantStatusService {
     private final SensorLogsRepository sensorLogsRepository;
     private final PlantEnvStandardsRepository plantEnvStandardsRepository;
     private final PlantStatusRepository plantStatusRepository;
-    private final IotService iotService;
+    private final DeviceCommandService deviceCommandService;
 
     public void evaluatePlantStatus(Long deviceId){
         // 1. 최신 센서 로그 조회 & 반려식물과 환경기준 조회
@@ -41,15 +41,9 @@ public class PlantStatusService {
         List<String> actionTypes = determinAction(temperatureScore, lightScore, humidityScore);
         boolean actionNeeded = !actionTypes.isEmpty();
 
-        // 4. 자동제어 여부 분기
-        if(actionNeeded && userPlant.isAutoControlEnabled()) {
-            for (String action : actionTypes) {
-                try {
-                    iotService.sendAction(userPlant.getId(), userPlant.getUser().getId(), action);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
+        // 4. 자동제어 여부에 따라 분기 처리
+        if (actionNeeded && userPlant.isAutoControlEnabled()) {
+            deviceCommandService.sendActions(userPlant, actionTypes);
         }
 
         // 5. 상태 저장 (actionNeeded는 자동제어 OFF이고 기준 미달일 때만 true)
@@ -85,6 +79,6 @@ public class PlantStatusService {
         if (tempScore == 0) actions.add("FAN");
         if (lightScore == 0) actions.add("LIGHT");
         if (humidScore == 0) actions.add("WATER");
-        return null;
+        return actions;
     }
 }

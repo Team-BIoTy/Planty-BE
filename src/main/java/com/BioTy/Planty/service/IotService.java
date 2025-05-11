@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -27,7 +26,6 @@ public class IotService {
     private final UserPlantRepository userPlantRepository;
     private final AdafruitClient adafruitClient;
     private final SensorLogsRepository sensorLogsRepository;
-    private final PlantStatusService plantStatusService;
 
     public List<IotDevice> getDevicesByUserId(Long userId){
         return iotRepository.findAllByUserId(userId);
@@ -60,9 +58,6 @@ public class IotService {
 
         SensorLogs logs = new SensorLogs(device, temperatureVal, humidityVal, lightVal, recordedAt);
         sensorLogsRepository.save(logs);
-
-        // 식물 점수 계산 및 업데이트 (환경 기준과 비교)
-        plantStatusService.evaluatePlantStatus(deviceId);
     }
 
     public void sendAction(Long userPlantId, Long userId, String actionType) {

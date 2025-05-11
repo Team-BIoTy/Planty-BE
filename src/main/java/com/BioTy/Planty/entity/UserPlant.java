@@ -27,7 +27,6 @@ public class UserPlant {
     private String imageUrl;
     private LocalDate adoptedAt;
 
-    @Builder.Default
     @Column(nullable = false)
     private boolean autoControlEnabled = true;
 
