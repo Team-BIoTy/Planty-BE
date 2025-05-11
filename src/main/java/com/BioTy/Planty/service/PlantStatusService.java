@@ -9,6 +9,7 @@ import com.BioTy.Planty.repository.PlantStatusRepository;
 import com.BioTy.Planty.repository.SensorLogsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -23,6 +24,7 @@ public class PlantStatusService {
     private final PlantStatusRepository plantStatusRepository;
     private final DeviceCommandService deviceCommandService;
 
+    @Transactional
     public void evaluatePlantStatus(Long deviceId){
         // 1. 최신 센서 로그 조회 & 반려식물과 환경기준 조회
         SensorLogs latestLog = sensorLogsRepository.findTopByIotDevice_IdOrderByRecordedAtDesc(deviceId)
