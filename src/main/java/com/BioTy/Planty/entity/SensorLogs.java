@@ -25,4 +25,12 @@ public class SensorLogs {
     private BigDecimal light;
 
     private LocalDateTime recordedAt;
+
+    public SensorLogs(IotDevice iotDevice, BigDecimal temperature, BigDecimal humidity, BigDecimal light, LocalDateTime recordedAt) {
+        this.iotDevice = iotDevice;
+        this.temperature = temperature;
+        this.humidity = humidity;
+        this.light = light;
+        this.recordedAt = recordedAt;
+    }
 }

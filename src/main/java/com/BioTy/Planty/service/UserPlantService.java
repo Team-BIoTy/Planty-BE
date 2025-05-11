@@ -19,7 +19,7 @@ public class UserPlantService {
     private final UserRepository userRepository;
     private final PlantInfoRepository plantInfoRepository;
     private final PersonalityRepository personalityRepository;
-    private final IotDeviceRepository iotDeviceRepository;
+    private final IotRepository iotRepository;
 
     // 사용자 반려식물 목록 조회
     public List<UserPlantSummaryResponseDto> getUserPlants(Long userId){
@@ -68,7 +68,7 @@ public class UserPlantService {
     public void registerDevice(Long userPlantId, Long iotDeviceId){
         UserPlant userPlant = userPlantRepository.findById(userPlantId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 반려식물이 존재하지 않습니다."));
-        IotDevice iotDevice = iotDeviceRepository.findById(iotDeviceId)
+        IotDevice iotDevice = iotRepository.findById(iotDeviceId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 IoT 기기가 존재하지 않습니다."));
 
         userPlant.setIotDevice(iotDevice);

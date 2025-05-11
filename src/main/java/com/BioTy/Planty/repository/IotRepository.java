@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface IotDeviceRepository extends JpaRepository<IotDevice, Long> {
+public interface IotRepository extends JpaRepository<IotDevice, Long> {
     List<IotDevice> findAllByUserId(Long userId);
 }

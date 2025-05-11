@@ -1,14 +1,14 @@
 package com.BioTy.Planty.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PlantStatus {
     @Id
@@ -26,13 +26,6 @@ public class PlantStatus {
     private String statusMessage;
     private LocalDateTime checkedAt;
 
-    public PlantStatus(UserPlant userPlant, Integer temperatureScore, Integer humidityScore,
-                       Integer lightScore, String statusMessage, LocalDateTime checkedAt) {
-        this.userPlant = userPlant;
-        this.temperatureScore = temperatureScore;
-        this.lightScore = lightScore;
-        this.humidityScore = humidityScore;
-        this.statusMessage = statusMessage;
-        this.checkedAt = checkedAt;
-    }
+    @Column(nullable = false)
+    private boolean actionNeeded = false;
 }
