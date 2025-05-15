@@ -81,4 +81,20 @@ public class UserPlantController {
     public UserPlantDetailResponseDto getUserPlantDetail(@PathVariable Long userPlantId) {
         return userPlantService.getUserPlantDetail(userPlantId);
     }
+
+    // 반려식물 삭제
+    @Operation(
+            summary = "반려식물 삭제",
+            description = "userPlantId를 이용해 반려식물을 삭제합니다. (연결된 IoT 디바이스도 자동으로 해제)")
+    @DeleteMapping("/{userPlantId}")
+    public ResponseEntity<Void> deleteUserPlant(
+            @PathVariable Long userPlantId,
+            @Parameter(hidden = true) @RequestHeader("Authorization") String token
+    ){
+        token = token.replace("Bearer ", "");
+        Long userId = authService.getUserIdFromToken(token);
+
+        userPlantService.deleteUserPlant(userPlantId, userId);
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -8,6 +8,7 @@ import com.BioTy.Planty.entity.*;
 import com.BioTy.Planty.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -78,5 +79,25 @@ public class UserPlantService {
     @Transactional
     public UserPlantDetailResponseDto getUserPlantDetail(Long userPlantId) {
         return userPlantRepository.findDetailDtoByUserPlantId(userPlantId);
+    }
+
+    // 반려식물 삭제
+    @Transactional
+    public void deleteUserPlant(Long userPlantId, Long userId){
+        UserPlant userPlant = userPlantRepository.findById(userPlantId)
+                .orElseThrow(() -> new IllegalArgumentException("반려식물을 찾을 수 없습니다."));
+        // 본인 소유의 반려식물이 아닌 경우
+        if(!userPlant.getUser().getId().equals(userId)){
+            throw new IllegalArgumentException("본인의 반려식물만 삭제할 수 있습니다.");
+        }
+
+        // IoT 디바이스 연결 해제
+        IotDevice iotDevice = userPlant.getIotDevice();
+        if (iotDevice != null){
+            iotDevice.setUserPlant(null);
+            userPlant.setIotDevice(null);
+        }
+
+        userPlantRepository.delete(userPlant);
     }
 }
