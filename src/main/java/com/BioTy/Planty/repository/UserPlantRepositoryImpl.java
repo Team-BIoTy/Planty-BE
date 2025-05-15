@@ -116,9 +116,13 @@ public class UserPlantRepositoryImpl implements UserPlantRepositoryCustom {
                 LIMIT 1
             ) ps ON ps.user_plant_id = up.id
             LEFT JOIN (
-                SELECT sl1.*
+              SELECT *
+              FROM (
+                SELECT sl1.*,\s
+                       ROW_NUMBER() OVER (PARTITION BY sl1.device_id ORDER BY sl1.recorded_at DESC) AS rn
                 FROM sensor_logs sl1
-                ORDER BY sl1.recorded_at DESC
+              ) filtered
+              WHERE rn = 1
             ) sl ON sl.device_id = id.id
             WHERE up.id = ?1
         """;
