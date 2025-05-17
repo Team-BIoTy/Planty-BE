@@ -111,8 +111,7 @@ public class UserPlantService {
                 userPlant.getNickname(),
                 userPlant.getAdoptedAt(),
                 userPlant.isAutoControlEnabled(),
-                userPlant.getPersonality().getId(),
-                userPlant.getIotDevice() != null ? userPlant.getIotDevice().getId() : null
+                userPlant.getPersonality().getId()
         );
     }
 
@@ -137,23 +136,6 @@ public class UserPlantService {
                     .orElseThrow(() -> new IllegalArgumentException("해당 ID의 성격이 존재하지 않습니다."));
             userPlant.setPersonality(newPersonality);
         }
-
-        IotDevice newDevice = null;
-        if (dto.getDeviceId() != null) {
-            newDevice = iotRepository.findById(dto.getDeviceId())
-                    .orElseThrow(() -> new IllegalArgumentException("IoT 디바이스를 찾을 수 없습니다."));
-        }
-
-        IotDevice currentDevice = userPlant.getIotDevice();
-        if (currentDevice != null && !currentDevice.equals(newDevice)) {
-            currentDevice.setUserPlant(null);
-        }
-
-        if (newDevice != null) {
-            newDevice.setUserPlant(userPlant);
-        }
-
-        userPlant.setIotDevice(newDevice);
     }
 
 }

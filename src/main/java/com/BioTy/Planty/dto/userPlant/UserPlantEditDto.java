@@ -16,5 +16,4 @@ public class UserPlantEditDto {
     private LocalDate adoptedAt;
     private Boolean autoControlEnabled;
     private Long personalityId;
-    private Long deviceId;
 }
