@@ -1,14 +1,10 @@
 package com.BioTy.Planty.service;
 
-import com.BioTy.Planty.dto.userPlant.PersonalityResponseDto;
-import com.BioTy.Planty.dto.userPlant.UserPlantCreateRequestDto;
-import com.BioTy.Planty.dto.userPlant.UserPlantDetailResponseDto;
-import com.BioTy.Planty.dto.userPlant.UserPlantSummaryResponseDto;
+import com.BioTy.Planty.dto.userPlant.*;
 import com.BioTy.Planty.entity.*;
 import com.BioTy.Planty.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -100,4 +96,64 @@ public class UserPlantService {
 
         userPlantRepository.delete(userPlant);
     }
+
+    // 반려식물 수정용 정보 조회
+    @Transactional
+    public UserPlantEditDto getUserPlantForEdit(Long userPlantId, Long userId) {
+        UserPlant userPlant = userPlantRepository.findById(userPlantId)
+                .orElseThrow(() -> new IllegalArgumentException("반려식물을 찾을 수 없습니다."));
+
+        if (!userPlant.getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("본인의 반려식물만 조회할 수 있습니다.");
+        }
+
+        return new UserPlantEditDto(
+                userPlant.getNickname(),
+                userPlant.getAdoptedAt(),
+                userPlant.isAutoControlEnabled(),
+                userPlant.getPersonality().getId(),
+                userPlant.getIotDevice() != null ? userPlant.getIotDevice().getId() : null
+        );
+    }
+
+    // 반려식물 수정
+    @Transactional
+    public void editUserPlant(Long userPlantId, Long userId, UserPlantEditDto dto){
+        UserPlant userPlant = userPlantRepository.findById(userPlantId)
+                .orElseThrow(() -> new IllegalArgumentException("반려식물을 찾을 수 없습니다."));
+        // 본인 소유의 반려식물이 아닌 경우
+        if(!userPlant.getUser().getId().equals(userId)){
+            throw new IllegalArgumentException("본인의 반려식물만 수정할 수 있습니다.");
+        }
+
+        // 필드 수정
+        if (dto.getNickname() != null) userPlant.setNickname(dto.getNickname());
+        if (dto.getAdoptedAt() != null) userPlant.setAdoptedAt(dto.getAdoptedAt());
+        if (dto.getAutoControlEnabled() != null) userPlant.setAutoControlEnabled(dto.getAutoControlEnabled());
+
+        Personality newPersonality = null;
+        if (dto.getPersonalityId() != null) {
+            newPersonality = personalityRepository.findById(dto.getPersonalityId())
+                    .orElseThrow(() -> new IllegalArgumentException("해당 ID의 성격이 존재하지 않습니다."));
+            userPlant.setPersonality(newPersonality);
+        }
+
+        IotDevice newDevice = null;
+        if (dto.getDeviceId() != null) {
+            newDevice = iotRepository.findById(dto.getDeviceId())
+                    .orElseThrow(() -> new IllegalArgumentException("IoT 디바이스를 찾을 수 없습니다."));
+        }
+
+        IotDevice currentDevice = userPlant.getIotDevice();
+        if (currentDevice != null && !currentDevice.equals(newDevice)) {
+            currentDevice.setUserPlant(null);
+        }
+
+        if (newDevice != null) {
+            newDevice.setUserPlant(userPlant);
+        }
+
+        userPlant.setIotDevice(newDevice);
+    }
+
 }
