@@ -1,6 +1,7 @@
 package com.BioTy.Planty.service;
 
 import com.BioTy.Planty.config.AdafruitClient;
+import com.BioTy.Planty.dto.iot.IotDeviceResponseDto;
 import com.BioTy.Planty.dto.iot.SensorLogResponseDto;
 import com.BioTy.Planty.entity.IotDevice;
 import com.BioTy.Planty.entity.SensorLogs;
@@ -27,8 +28,10 @@ public class IotService {
     private final AdafruitClient adafruitClient;
     private final SensorLogsRepository sensorLogsRepository;
 
-    public List<IotDevice> getDevicesByUserId(Long userId){
-        return iotRepository.findAllByUserId(userId);
+    public List<IotDeviceResponseDto> getDevicesByUserId(Long userId){
+        return iotRepository.findAllByUserId(userId).stream()
+                .map(IotDeviceResponseDto::from)
+                .toList();
     }
 
     public void fetchAndSaveSensorLog(Long deviceId) {

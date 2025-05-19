@@ -7,6 +7,7 @@ import com.BioTy.Planty.dto.userPlant.UserPlantSummaryResponseDto;
 import com.BioTy.Planty.dto.userPlant.detail.DetailEnvStandardDto;
 import com.BioTy.Planty.dto.userPlant.detail.DetailSensorDto;
 import com.BioTy.Planty.dto.userPlant.detail.DetailStatusDto;
+import com.BioTy.Planty.entity.IotDevice;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
@@ -101,7 +102,10 @@ public class UserPlantRepositoryImpl implements UserPlantRepositoryCustom {
               ps.temperature_score, ps.light_score, ps.humidity_score, ps.status_message, ps.checked_at,
 
               -- SensorLogs (latest)
-              sl.temperature, sl.humidity, sl.light, sl.recorded_at
+              sl.temperature, sl.humidity, sl.light, sl.recorded_at,
+              
+              -- IotDevice
+              id.id, id.device_serial, id.model, id.status
 
             FROM user_plant up
             LEFT JOIN personality p ON up.personality_id = p.id
@@ -116,9 +120,13 @@ public class UserPlantRepositoryImpl implements UserPlantRepositoryCustom {
                 LIMIT 1
             ) ps ON ps.user_plant_id = up.id
             LEFT JOIN (
-                SELECT sl1.*
+              SELECT *
+              FROM (
+                SELECT sl1.*,\s
+                       ROW_NUMBER() OVER (PARTITION BY sl1.device_id ORDER BY sl1.recorded_at DESC) AS rn
                 FROM sensor_logs sl1
-                ORDER BY sl1.recorded_at DESC
+              ) filtered
+              WHERE rn = 1
             ) sl ON sl.device_id = id.id
             WHERE up.id = ?1
         """;
@@ -235,6 +243,20 @@ public class UserPlantRepositoryImpl implements UserPlantRepositoryCustom {
         )
                 : null;
 
+        Long deviceId = result[idx] != null ? ((Number) result[idx++]).longValue() : null;
+        String deviceSerial = (String) result[idx++];
+        String deviceModel = (String) result[idx++];
+        String deviceStatus = (String) result[idx++];
+
+        IotDevice iotDevice = null;
+        if (deviceId != null) {
+            iotDevice = new IotDevice();
+            iotDevice.setId(deviceId);
+            iotDevice.setDeviceSerial(deviceSerial);
+            iotDevice.setModel(deviceModel);
+            iotDevice.setStatus(deviceStatus);
+        }
+
         // --- 최종 조립
         return new UserPlantDetailResponseDto(
                 userPlantIdRes,
@@ -245,7 +267,8 @@ public class UserPlantRepositoryImpl implements UserPlantRepositoryCustom {
                 plantInfo,
                 envStandard,
                 statusDto,
-                sensorDto
+                sensorDto,
+                iotDevice
         );
 
     }

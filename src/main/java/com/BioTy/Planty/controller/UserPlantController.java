@@ -4,6 +4,7 @@ import com.BioTy.Planty.dto.iot.RegisterDeviceRequestDto;
 import com.BioTy.Planty.dto.userPlant.UserPlantCreateRequestDto;
 import com.BioTy.Planty.dto.userPlant.UserPlantDetailResponseDto;
 import com.BioTy.Planty.dto.userPlant.UserPlantSummaryResponseDto;
+import com.BioTy.Planty.dto.userPlant.UserPlantEditDto;
 import com.BioTy.Planty.service.AuthService;
 import com.BioTy.Planty.service.UserPlantService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -80,5 +81,53 @@ public class UserPlantController {
     @GetMapping("/{userPlantId}")
     public UserPlantDetailResponseDto getUserPlantDetail(@PathVariable Long userPlantId) {
         return userPlantService.getUserPlantDetail(userPlantId);
+    }
+
+    // 반려식물 삭제
+    @Operation(
+            summary = "반려식물 삭제",
+            description = "userPlantId를 이용해 반려식물을 삭제합니다. (연결된 IoT 디바이스도 자동으로 해제)")
+    @DeleteMapping("/{userPlantId}")
+    public ResponseEntity<Void> deleteUserPlant(
+            @PathVariable Long userPlantId,
+            @Parameter(hidden = true) @RequestHeader("Authorization") String token
+    ){
+        token = token.replace("Bearer ", "");
+        Long userId = authService.getUserIdFromToken(token);
+
+        userPlantService.deleteUserPlant(userPlantId, userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    // 반려식물 수정용 조회
+    @Operation(
+            summary = "수정용 반려식물 정보 조회",
+            description = "수정을 위한 반려식물의 정보를 조회합니다.")
+    @GetMapping("/edit/{userPlantId}")
+    public UserPlantEditDto getUserPlantForEdit(
+            @PathVariable Long userPlantId,
+            @Parameter(hidden = true) @RequestHeader("Authorization") String token
+    ) {
+        token = token.replace("Bearer ", "");
+        Long userId = authService.getUserIdFromToken(token);
+
+        return userPlantService.getUserPlantForEdit(userPlantId, userId);
+    }
+
+    // 반려식물 수정
+    @Operation(
+            summary = "반려식물 정보 수정",
+            description = "반려식물의 정보를 수정합니다.")
+    @PutMapping("/edit/{userPlantId}")
+    public ResponseEntity<Void> editUserPlant(
+            @PathVariable Long userPlantId,
+            @RequestBody UserPlantEditDto requestDto,
+            @Parameter(hidden = true) @RequestHeader("Authorization") String token
+    ){
+        token = token.replace("Bearer ", "");
+        Long userId = authService.getUserIdFromToken(token);
+
+        userPlantService.editUserPlant(userPlantId, userId, requestDto);
+        return ResponseEntity.ok().build();
     }
 }

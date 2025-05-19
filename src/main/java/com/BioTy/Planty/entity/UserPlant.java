@@ -1,10 +1,7 @@
 package com.BioTy.Planty.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -13,6 +10,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserPlant {
     @Id
@@ -40,6 +38,9 @@ public class UserPlant {
 
     @OneToMany(mappedBy = "userPlant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PlantStatus> statuses = new ArrayList<>();
+
+    @OneToMany(mappedBy = "userPlant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ChatRoom> chatRooms = new ArrayList<>();
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "iot_device_id")

@@ -11,6 +11,7 @@ public class IotDeviceResponseDto {
     private String deviceSerial;
     private String model;
     private String status;
+    private boolean isConnected;
 
     public static IotDeviceResponseDto from(IotDevice device){
         return IotDeviceResponseDto.builder()
@@ -18,6 +19,7 @@ public class IotDeviceResponseDto {
                 .deviceSerial(device.getDeviceSerial())
                 .model(device.getModel())
                 .status(device.getStatus())
+                .isConnected(device.getUserPlant() != null)
                 .build();
     }
 }

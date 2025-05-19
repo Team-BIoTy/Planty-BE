@@ -36,13 +36,8 @@ public class IotController {
     ) {
         token = token.replace("Bearer ", "");
         Long userId = authService.getUserIdFromToken(token);
-        List<IotDevice> devices = iotService.getDevicesByUserId(userId);
 
-        List<IotDeviceResponseDto> response = devices.stream()
-                .map(IotDeviceResponseDto::from)
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(iotService.getDevicesByUserId(userId));
     }
 
     @Operation(
