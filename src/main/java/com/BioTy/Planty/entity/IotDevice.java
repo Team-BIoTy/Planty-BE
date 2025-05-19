@@ -6,13 +6,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Table(name = "iot_device")
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor()
 public class IotDevice {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,6 +26,4 @@ public class IotDevice {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
-
-    private LocalDateTime lastOnline;
 }
