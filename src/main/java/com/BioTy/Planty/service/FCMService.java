@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class UserDeviceTokenService {
+public class FCMService {
     private final UserDeviceTokenRepository tokenRepository;
     private final UserRepository userRepository;
 
