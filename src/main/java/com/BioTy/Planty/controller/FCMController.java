@@ -1,6 +1,6 @@
 package com.BioTy.Planty.controller;
 
-import com.BioTy.Planty.dto.fcm.DeviceTokenRequest;
+import com.BioTy.Planty.dto.fcm.DeviceTokenRequestDto;
 import com.BioTy.Planty.dto.fcm.SendNotificationRequestDto;
 import com.BioTy.Planty.service.AuthService;
 import com.BioTy.Planty.service.FCMService;
@@ -25,7 +25,7 @@ public class FCMController {
             description = "Firebase 알림 전송을 위해 사용자의 FCM 디바이스 토큰을 저장합니다."
     )
     public ResponseEntity<Void> saveDeviceToken(
-            @RequestBody DeviceTokenRequest request,
+            @RequestBody DeviceTokenRequestDto request,
             @Parameter(hidden = true) @RequestHeader("Authorization") String token
     ) {
         token = token.replace("Bearer ", "");
@@ -41,9 +41,9 @@ public class FCMController {
             description = "디바이스 토큰을 이용해 알림을 직접 전송합니다."
     )
     public ResponseEntity<Void> sendNotification(
-            @RequestBody SendNotificationRequestDto dto
+            @RequestBody SendNotificationRequestDto request
             ){
-        fcmService.sendMessage(dto.getTargetToken(), dto.getTitle(), dto.getBody());
+        fcmService.sendMessage(request.getTargetToken(), request.getTitle(), request.getBody());
         return ResponseEntity.ok().build();
     }
 }

@@ -5,6 +5,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class DeviceTokenRequest {
+public class DeviceTokenRequestDto {
     private String token;
 }
