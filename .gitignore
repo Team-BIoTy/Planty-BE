@@ -36,3 +36,4 @@ out/
 
 ### VS Code ###
 .vscode/
+src/main/resources/firebase/planty-dku-firebase-adminsdk-fbsvc-b748913f79.json
