@@ -16,5 +16,7 @@ public class ChatRoomDetailDto {
     private String personalityLabel;
     private String personalityEmoji;
     private String personalityColor;
+    private Long sensorLogId;
+    private Long plantEnvStandardsId;
     private List<ChatMessageResponseDto> messages;
 }

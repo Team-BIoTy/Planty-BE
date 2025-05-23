@@ -79,7 +79,13 @@ public class ChatController {
             @PathVariable Long chatRoomId,
             @RequestBody SendMessageRequestDto request
             ){
-        ChatMessageResponseDto response = chatService.sendMessage(chatRoomId, request.getMessage());
+        ChatMessageResponseDto response = chatService.sendMessage(
+                chatRoomId,
+                request.getMessage(),
+                request.getSensorLogId(),
+                request.getPlantEnvStandardsId(),
+                request.getPersona()
+        );
         return ResponseEntity.ok(response);
     }
 }
