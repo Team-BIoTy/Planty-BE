@@ -72,10 +72,16 @@ public class IotService {
         }
 
         switch (actionType.toUpperCase()) {
-            case "WATER" -> adafruitClient.sendCommand("action.water");
-            case "FAN"   -> adafruitClient.sendCommand("action.fan");
-            case "LIGHT" -> adafruitClient.sendCommand("action.light");
-            default      -> throw new IllegalArgumentException("지원하지 않는 명령입니다.");
+            case "WATER_ON" -> adafruitClient.sendCommand("action.water", "ON");
+            case "WATER_OFF" -> adafruitClient.sendCommand("action.water", "OFF");
+
+            case "FAN_ON" -> adafruitClient.sendCommand("action.fan", "ON");
+            case "FAN_OFF" -> adafruitClient.sendCommand("action.fan", "OFF");
+
+            case "LIGHT_ON" -> adafruitClient.sendCommand("action.light", "ON");
+            case "LIGHT_OFF" -> adafruitClient.sendCommand("action.light", "OFF");
+
+            default -> throw new IllegalArgumentException("지원하지 않는 명령입니다.");
         }
     }
 }
