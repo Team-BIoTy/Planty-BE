@@ -113,6 +113,7 @@ public class ChatService {
 
         return new ChatRoomDetailDto(
                 chatRoomId,
+                userPlant.getId(),
                 nickname,
                 imageUrl,
                 personalityLabel,
@@ -144,6 +145,8 @@ public class ChatService {
             requestBody.put("plant_env_standards_id", plantEnvStandardsId);
             requestBody.put("persona", persona);
             requestBody.put("user_input", message);
+
+            System.out.println("🔍 [Agent 요청] " + requestBody);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);

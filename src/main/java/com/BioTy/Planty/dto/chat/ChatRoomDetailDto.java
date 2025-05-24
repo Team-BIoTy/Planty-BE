@@ -11,6 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 public class ChatRoomDetailDto {
     private Long chatRoomId;
+    private Long userPlantId;
     private String userPlantNickname;
     private String imageUrl;
     private String personalityLabel;
