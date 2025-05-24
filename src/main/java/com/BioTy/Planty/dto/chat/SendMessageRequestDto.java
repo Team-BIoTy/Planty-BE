@@ -9,4 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SendMessageRequestDto {
     private String message;
+    private Long sensorLogId;
+    private Long plantEnvStandardsId;
+    private String persona;
 }

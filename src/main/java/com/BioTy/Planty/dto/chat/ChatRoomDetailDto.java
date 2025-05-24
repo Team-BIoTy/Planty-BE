@@ -11,10 +11,13 @@ import java.util.List;
 @NoArgsConstructor
 public class ChatRoomDetailDto {
     private Long chatRoomId;
+    private Long userPlantId;
     private String userPlantNickname;
     private String imageUrl;
     private String personalityLabel;
     private String personalityEmoji;
     private String personalityColor;
+    private Long sensorLogId;
+    private Long plantEnvStandardsId;
     private List<ChatMessageResponseDto> messages;
 }

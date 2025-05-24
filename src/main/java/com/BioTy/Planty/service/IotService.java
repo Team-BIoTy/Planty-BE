@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
@@ -59,7 +60,8 @@ public class IotService {
                 .withZoneSameInstant(ZoneId.of("Asia/Seoul"))
                 .toLocalDateTime();
 
-        SensorLogs logs = new SensorLogs(device, temperatureVal, humidityVal, lightVal, recordedAt);
+        SensorLogs logs = new SensorLogs(device, temperatureVal, humidityVal, lightVal,
+                recordedAt, LocalDateTime.now());
         sensorLogsRepository.save(logs);
     }
 
@@ -71,11 +73,31 @@ public class IotService {
             throw new RuntimeException("해당 식물에 대한 권한이 없습니다.");
         }
 
+        Long deviceId = userPlant.getIotDevice().getId();
+        String timestamp = LocalDateTime.now()
+                .format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+
         switch (actionType.toUpperCase()) {
-            case "WATER" -> adafruitClient.sendCommand("action.water");
-            case "FAN"   -> adafruitClient.sendCommand("action.fan");
-            case "LIGHT" -> adafruitClient.sendCommand("action.light");
-            default      -> throw new IllegalArgumentException("지원하지 않는 명령입니다.");
+            case "WATER_ON" -> adafruitClient.sendCommand("action.water", "ON");
+            case "WATER_OFF" -> adafruitClient.sendCommand("action.water", "OFF");
+
+            case "FAN_ON" -> adafruitClient.sendCommand("action.fan", "ON");
+            case "FAN_OFF" -> adafruitClient.sendCommand("action.fan", "OFF");
+
+            case "LIGHT_ON" -> adafruitClient.sendCommand("action.light", "ON");
+            case "LIGHT_OFF" -> adafruitClient.sendCommand("action.light", "OFF");
+
+            case "REFRESH" -> {
+                String value = deviceId + "_" + timestamp;
+                adafruitClient.sendCommand("action.refresh", value);
+                try {
+                    Thread.sleep(3000); // 3초 정도 대기
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                fetchAndSaveSensorLog(deviceId);
+            }
+            default -> throw new IllegalArgumentException("지원하지 않는 명령입니다.");
         }
     }
 }

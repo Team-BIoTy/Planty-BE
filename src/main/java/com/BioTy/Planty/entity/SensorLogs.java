@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -25,12 +26,14 @@ public class SensorLogs {
     private BigDecimal light;
 
     private LocalDateTime recordedAt;
+    private LocalDateTime checkedAt;
 
-    public SensorLogs(IotDevice iotDevice, BigDecimal temperature, BigDecimal humidity, BigDecimal light, LocalDateTime recordedAt) {
+    public SensorLogs(IotDevice iotDevice, BigDecimal temperature, BigDecimal humidity, BigDecimal light, LocalDateTime recordedAt, LocalDateTime checkedAt) {
         this.iotDevice = iotDevice;
         this.temperature = temperature;
         this.humidity = humidity;
         this.light = light;
         this.recordedAt = recordedAt;
+        this.checkedAt = checkedAt;
     }
 }

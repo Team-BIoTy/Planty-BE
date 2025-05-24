@@ -22,7 +22,9 @@ public class ChatMessage {
     @Enumerated(EnumType.STRING)
     private Sender sender; // USER or BOT
 
+    @Column(columnDefinition = "TEXT")
     private String message;
+
     private LocalDateTime timestamp = LocalDateTime.now();
 
     public ChatMessage(Long chatRoomId, Sender sender, String message) {

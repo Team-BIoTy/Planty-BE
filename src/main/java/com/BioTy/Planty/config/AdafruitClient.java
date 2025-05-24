@@ -38,14 +38,14 @@ public class AdafruitClient {
         return restTemplate.exchange(url, HttpMethod.GET, request, SensorLogResponseDto.class).getBody();
     }
 
-    public void sendCommand(String feedKey){
+    public void sendCommand(String feedKey, String value){
         String url = String.format("%s/api/v2/%s/feeds/%s/data", baseUrl, username, feedKey);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("X-AIO-Key", apiKey);
 
-        Map<String, String> body = Map.of("value", "ON");
+        Map<String, String> body = Map.of("value", value);
 
         HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
         restTemplate.postForEntity(url, request, String.class);
