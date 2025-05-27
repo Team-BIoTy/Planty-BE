@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -26,6 +24,5 @@ public class DeviceCommand {
     private String commandType; // WATER, LIGHT, FAN
     private LocalDateTime sentAt;
 
-    @OneToMany(mappedBy = "command", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DeviceActionLog> actionLogs = new ArrayList<>();
+
 }

@@ -1,9 +1,7 @@
 package com.BioTy.Planty.service;
 
-import com.BioTy.Planty.entity.DeviceActionLog;
 import com.BioTy.Planty.entity.DeviceCommand;
 import com.BioTy.Planty.entity.UserPlant;
-import com.BioTy.Planty.repository.DeviceActionLogRepository;
 import com.BioTy.Planty.repository.DeviceCommandRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,7 +14,6 @@ import java.util.List;
 public class DeviceCommandService {
     private final IotService iotService;
     private final DeviceCommandRepository commandRepository;
-    private final DeviceActionLogRepository actionLogRepository;
 
     public void executeCommands(UserPlant userPlant, List<String> actionTypes) {
         for (String action : actionTypes) {
@@ -32,14 +29,6 @@ public class DeviceCommandService {
                         .sentAt(LocalDateTime.now())
                         .build();
                 commandRepository.save(command);
-
-                // 3. 실행 후 상태 기록 (device_action_log)
-                DeviceActionLog log = DeviceActionLog.builder()
-                        .command(command)
-                        .executedAt(LocalDateTime.now())
-                        .result("pending")
-                        .build();
-                actionLogRepository.save(log);
 
             } catch (Exception e) {
                 e.printStackTrace();
