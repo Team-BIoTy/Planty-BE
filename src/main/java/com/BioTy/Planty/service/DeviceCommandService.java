@@ -21,12 +21,23 @@ public class DeviceCommandService {
                 // 1. 명령 전송
                 iotService.sendCommandToAdafruit(userPlant.getId(), userPlant.getUser().getId(), action);
 
-                // 2. 전송한 명령 기록 (device_command)
+                // 2. 명령 지속시간 계산
+                LocalDateTime now = LocalDateTime.now();
+                LocalDateTime willEndAt = switch (action) {
+                    case "WATER" -> now.plusSeconds(30);
+                    case "FAN" -> now.plusMinutes(5);
+                    case "LIGHT" -> now.plusMinutes(5);
+                    default -> now.plusSeconds(0);
+                };
+
+                // 3. 전송한 명령 기록 (device_command)
                 DeviceCommand command = DeviceCommand.builder()
                         .iotDevice(userPlant.getIotDevice())
                         .userPlant(userPlant)
                         .commandType(action)
-                        .sentAt(LocalDateTime.now())
+                        .sentAt(now)
+                        .status("RUNNING")
+                        .willBeTurnedOffAt(willEndAt)
                         .build();
                 commandRepository.save(command);
 
