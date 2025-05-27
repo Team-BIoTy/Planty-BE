@@ -17,6 +17,8 @@ public class UserPlantService {
     private final PlantInfoRepository plantInfoRepository;
     private final PersonalityRepository personalityRepository;
     private final IotRepository iotRepository;
+    private final IotService iotService;
+    private final PlantStatusService plantStatusService;
 
     // 사용자 반려식물 목록 조회
     public List<UserPlantSummaryResponseDto> getUserPlants(Long userId){
@@ -69,6 +71,14 @@ public class UserPlantService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 IoT 기기가 존재하지 않습니다."));
 
         userPlant.setIotDevice(iotDevice);
+        iotDevice.setUserPlant(userPlant);
+
+        try {
+            iotService.fetchAndSaveSensorLog(iotDeviceId);
+            plantStatusService.evaluatePlantStatus(iotDeviceId);
+        } catch (Exception e) {
+            System.err.println("센서 수집 또는 상태 평가 실패: " + e.getMessage());
+        }
     }
 
     // 반려식물 상세 정보 조회
