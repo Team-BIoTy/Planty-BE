@@ -81,6 +81,19 @@ public class UserPlantService {
         }
     }
 
+    // 특정 반려식물 조회
+    @Transactional
+    public UserPlant getUserPlantEntity(Long userPlantId, Long userId) {
+        UserPlant userPlant = userPlantRepository.findById(userPlantId)
+                .orElseThrow(() -> new IllegalArgumentException("반려식물을 찾을 수 없습니다."));
+
+        if (!userPlant.getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("본인의 반려식물만 조회할 수 있습니다.");
+        }
+
+        return userPlant;
+    }
+
     // 반려식물 상세 정보 조회
     @Transactional
     public UserPlantDetailResponseDto getUserPlantDetail(Long userPlantId) {

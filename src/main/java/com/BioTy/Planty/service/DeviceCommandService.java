@@ -36,6 +36,7 @@ public class DeviceCommandService {
                 // 3. 실행 후 상태 기록 (device_action_log)
                 DeviceActionLog log = DeviceActionLog.builder()
                         .command(command)
+                        .executedAt(LocalDateTime.now())
                         .result("pending")
                         .build();
                 actionLogRepository.save(log);
