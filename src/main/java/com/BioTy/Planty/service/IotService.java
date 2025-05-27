@@ -97,7 +97,7 @@ public class IotService {
                 }
                 fetchAndSaveSensorLog(deviceId);
             }
-            default -> throw new IllegalArgumentException("지원하지 않는 명령입니다.");
+            default -> throw new IllegalArgumentException("지원하지 않는 명령입니다." + actionType);
         }
     }
 }
