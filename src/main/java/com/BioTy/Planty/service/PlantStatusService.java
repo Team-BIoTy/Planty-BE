@@ -63,8 +63,24 @@ public class PlantStatusService {
     }
 
     private int calcScore(BigDecimal value, int min, int max){
-        return (value.compareTo(BigDecimal.valueOf(min)) >= 0 &&
-                value.compareTo(BigDecimal.valueOf(max)) <= 0) ? 1 : 0;
+        BigDecimal minVal = BigDecimal.valueOf(min);
+        BigDecimal maxVal = BigDecimal.valueOf(max);
+
+        if (value.compareTo(minVal) < 0 || value.compareTo(maxVal) > 0) {
+            return 0; // 기준 벗어나면 0점
+        }
+
+        BigDecimal range = maxVal.subtract(minVal);
+        BigDecimal third = range.divide(BigDecimal.valueOf(3), 2, BigDecimal.ROUND_HALF_UP);
+        BigDecimal fromMin = value.subtract(minVal);
+
+        if (fromMin.compareTo(third) < 0) {
+            return 1;
+        } else if (fromMin.compareTo(third.multiply(BigDecimal.valueOf(2))) < 0) {
+            return 2;
+        } else {
+            return 3;
+        }
     }
 
     // 임시 메시지 (추후 AI 연동 - 성격에 맞게 변경)
