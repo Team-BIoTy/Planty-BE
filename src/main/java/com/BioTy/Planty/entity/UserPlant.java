@@ -42,6 +42,9 @@ public class UserPlant {
     @OneToMany(mappedBy = "userPlant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatRoom> chatRooms = new ArrayList<>();
 
+    @OneToMany(mappedBy = "userPlant", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DeviceCommand> deviceCommands = new ArrayList<>();
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "iot_device_id")
     private IotDevice iotDevice;
