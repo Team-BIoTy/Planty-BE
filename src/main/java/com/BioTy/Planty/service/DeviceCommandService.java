@@ -3,6 +3,7 @@ package com.BioTy.Planty.service;
 import com.BioTy.Planty.entity.DeviceCommand;
 import com.BioTy.Planty.entity.UserPlant;
 import com.BioTy.Planty.repository.DeviceCommandRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -71,4 +72,29 @@ public class DeviceCommandService {
             }
         }
     }
+    @Transactional
+    public void cancelCommand(Long commandId, Long userId) {
+        DeviceCommand command = commandRepository.findById(commandId)
+                .orElseThrow(() -> new IllegalArgumentException("명령을 찾을 수 없습니다."));
+
+        if (!command.getUserPlant().getUser().getId().equals(userId)) {
+            throw new IllegalArgumentException("본인의 명령만 취소할 수 있습니다.");
+        }
+
+        if (!command.getStatus().equals("RUNNING")) {
+            throw new IllegalStateException("이미 종료된 명령입니다.");
+        }
+
+        // OFF 명령 전송
+        String offAction = command.getCommandType() + "_OFF";
+        iotService.sendCommandToAdafruit(
+                command.getUserPlant().getId(),
+                userId,
+                offAction
+        );
+
+        command.setStatus("CANCELLED");
+        commandRepository.save(command);
+    }
+
 }

@@ -74,4 +74,16 @@ public class IotController {
         deviceCommandService.executeCommands(userPlant, List.of(request.getType()));
         return ResponseEntity.ok().build();
     }
+
+    @PatchMapping("/commands/{commandId}/cancel")
+    @Operation(summary = "명령 취소", description = "사용자가 진행 중인 명령을 중단합니다.")
+    public ResponseEntity<Void> cancelCommand(
+            @PathVariable Long commandId,
+            @Parameter(hidden = true) @RequestHeader("Authorization") String token
+    ) {
+        Long userId = authService.getUserIdFromToken(token.replace("Bearer ", ""));
+        deviceCommandService.cancelCommand(commandId, userId);
+        return ResponseEntity.ok().build();
+    }
+
 }
