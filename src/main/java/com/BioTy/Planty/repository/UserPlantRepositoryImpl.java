@@ -35,6 +35,7 @@ public class UserPlantRepositoryImpl implements UserPlantRepositoryCustom {
               ps.light_score,
               ps.humidity_score,
               ps.status_message,
+              ps.checked_at,
               p.label AS personality_label,
               p.emoji AS personality_emoji,
               p.color AS personality_color
@@ -62,12 +63,13 @@ public class UserPlantRepositoryImpl implements UserPlantRepositoryCustom {
                         (Integer) row[4],
                         (Integer) row[5],
                         (Integer) row[6],
-                        (String) row[7]
+                        (String) row[7],
+                        ((java.sql.Timestamp) row[8]).toLocalDateTime()
                 ),
                 new UserPlantSummaryResponseDto.Personality(
-                        (String) row[8],
                         (String) row[9],
-                        (String) row[10]
+                        (String) row[10],
+                        (String) row[11]
                 )
         )).toList();
     }

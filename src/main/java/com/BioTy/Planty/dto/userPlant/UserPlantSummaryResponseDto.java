@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
@@ -23,6 +24,7 @@ public class UserPlantSummaryResponseDto {
         private Integer lightScore;
         private Integer humidityScore;
         private String message;
+        private LocalDateTime checkedAt;
     }
 
     @Getter
