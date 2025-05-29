@@ -1,6 +1,7 @@
 package com.BioTy.Planty.service;
 
 import com.BioTy.Planty.entity.*;
+import com.BioTy.Planty.repository.DeviceCommandRepository;
 import com.BioTy.Planty.repository.PlantEnvStandardsRepository;
 import com.BioTy.Planty.repository.PlantStatusRepository;
 import com.BioTy.Planty.repository.SensorLogsRepository;
@@ -20,10 +21,10 @@ public class PlantStatusService {
     private final SensorLogsRepository sensorLogsRepository;
     private final PlantEnvStandardsRepository plantEnvStandardsRepository;
     private final PlantStatusRepository plantStatusRepository;
-    private final DeviceCommandService deviceCommandService;
+    private final DeviceCommandRepository deviceCommandRepository;
 
     @Transactional
-    public void evaluatePlantStatus(Long deviceId){
+    public List<String> evaluatePlantStatus(Long deviceId){
         // 1. 최신 센서 로그 조회 & 반려식물과 환경기준 조회
         SensorLogs latestLog = sensorLogsRepository.findTopByIotDevice_IdOrderByRecordedAtDesc(deviceId)
                 .orElseThrow(() -> new RuntimeException("센서 로그 없음"));
@@ -43,19 +44,14 @@ public class PlantStatusService {
 
         // * 최근 명령 수행이 10분 이내 종료됐다면 재실행 X
         Optional<DeviceCommand> lastCommandOpt
-                = deviceCommandService.getLastCommand(userPlant.getId());
+                = deviceCommandRepository.findTopByUserPlant_IdOrderByWillBeTurnedOffAtDesc(userPlant.getId());
         boolean preventAutoRetry = lastCommandOpt
                 .filter(cmd -> "DONE".equals(cmd.getStatus()))
                 .filter(cmd -> cmd.getWillBeTurnedOffAt() != null)
                 .map(cmd -> cmd.getWillBeTurnedOffAt().isAfter(LocalDateTime.now().minusMinutes(10)))
                 .orElse(false);
 
-        // 4. 자동제어 여부에 따라 분기 처리
-        if (actionNeeded && userPlant.isAutoControlEnabled() && !preventAutoRetry) {
-            deviceCommandService.executeCommands(userPlant, actionTypes);
-        }
-
-        // 5. 상태 저장 (actionNeeded는 자동제어 OFF이고 기준 미달일 때만 true)
+        // 4. 상태 저장 (actionNeeded는 자동제어 OFF이고 기준 미달일 때만 true)
         PlantStatus status = PlantStatus.builder()
                 .userPlant(userPlant)
                 .temperatureScore(temperatureScore)
@@ -67,6 +63,11 @@ public class PlantStatusService {
                 .build();
 
         plantStatusRepository.save(status);
+
+        // 5. 자동제어 여부에 따라 분기 처리
+        return (actionNeeded && userPlant.isAutoControlEnabled() && !preventAutoRetry)
+                ? actionTypes
+                : List.of(); // 자동 제어 안함 or 쿨타임
     }
 
     private int calcScore(BigDecimal value, int min, int max){
