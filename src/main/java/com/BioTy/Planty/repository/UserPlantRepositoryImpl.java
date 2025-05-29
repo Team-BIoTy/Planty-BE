@@ -63,11 +63,15 @@ public class UserPlantRepositoryImpl implements UserPlantRepositoryCustom {
         List<Object[]> commandRows
                 = deviceCommandRepository.findRunningCommandsByUserPlantIds(userPlantIds, LocalDateTime.now());
 
-        Map<Long, List<String>> runningMap = new HashMap<>();
+        Map<Long, Map<String, Long>> runningMap = new HashMap<>();
         for(Object[] row : commandRows) {
             Long plantId = ((Number) row[0]).longValue();
             String commandType = (String)row[1];
-            runningMap.computeIfAbsent(plantId, k -> new ArrayList<>()).add(commandType);
+            Long commandId = ((Number) row[2]).longValue();
+
+            runningMap
+                    .computeIfAbsent(plantId, k -> new HashMap<>())
+                    .put(commandType, commandId);
         }
 
         return rows.stream().map(row -> {
@@ -91,18 +95,16 @@ public class UserPlantRepositoryImpl implements UserPlantRepositoryCustom {
                     )
             );
 
-            Map<String, Boolean> commandStates = new HashMap<>();
-            commandStates.put("FAN", false);
-            commandStates.put("LIGHT", false);
-            commandStates.put("WATER", false);
+            Map<String, Long> commandMap = new HashMap<>();
+            commandMap.put("FAN", null);
+            commandMap.put("LIGHT", null);
+            commandMap.put("WATER", null);
 
             if (runningMap.containsKey(userPlantId)) {
-                for (String cmd : runningMap.get(userPlantId)) {
-                    commandStates.put(cmd, true);
-                }
+                commandMap.putAll(runningMap.get(userPlantId));
             }
 
-            dto.setRunningCommands(commandStates);
+            dto.setRunningCommands(commandMap);
             return dto;
         }).toList();
     }

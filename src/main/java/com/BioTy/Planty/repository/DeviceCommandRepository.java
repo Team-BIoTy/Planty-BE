@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface DeviceCommandRepository extends JpaRepository<DeviceCommand, Long> {
     @Query("""
-        SELECT dc.userPlant.id, dc.commandType
+        SELECT dc.userPlant.id, dc.commandType, dc.id
         FROM DeviceCommand dc
         WHERE dc.status = 'RUNNING'
           AND dc.willBeTurnedOffAt > :now

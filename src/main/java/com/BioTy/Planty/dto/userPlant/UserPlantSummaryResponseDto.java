@@ -16,7 +16,7 @@ public class UserPlantSummaryResponseDto {
 
     private Status status;
     private Personality personality;
-    private Map<String, Boolean> runningCommands;
+    private Map<String, Long> runningCommands;
 
     public UserPlantSummaryResponseDto(
             Long userPlantId,
@@ -35,7 +35,7 @@ public class UserPlantSummaryResponseDto {
         this.runningCommands = null;
     }
 
-    public void setRunningCommands(Map<String, Boolean> runningCommands) {
+    public void setRunningCommands(Map<String, Long> runningCommands) {
         this.runningCommands = runningCommands;
     }
 
