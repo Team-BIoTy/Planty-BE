@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -102,6 +103,10 @@ public class DeviceCommandService {
 
         command.setStatus("CANCELLED");
         commandRepository.save(command);
+    }
+
+    public Optional<DeviceCommand> getLastCommand(Long userPlantId) {
+        return commandRepository.findTopByUserPlant_IdOrderByWillBeTurnedOffAtDesc(userPlantId);
     }
 
 }

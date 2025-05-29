@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface DeviceCommandRepository extends JpaRepository<DeviceCommand, Long> {
@@ -22,4 +23,6 @@ public interface DeviceCommandRepository extends JpaRepository<DeviceCommand, Lo
             @Param("userPlantIds") List<Long> userPlantIds,
             @Param("now") LocalDateTime now
     );
+
+    Optional<DeviceCommand> findTopByUserPlant_IdOrderByWillBeTurnedOffAtDesc(Long userPlantId);
 }

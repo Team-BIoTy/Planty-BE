@@ -1,9 +1,6 @@
 package com.BioTy.Planty.service;
 
-import com.BioTy.Planty.entity.PlantEnvStandards;
-import com.BioTy.Planty.entity.PlantStatus;
-import com.BioTy.Planty.entity.SensorLogs;
-import com.BioTy.Planty.entity.UserPlant;
+import com.BioTy.Planty.entity.*;
 import com.BioTy.Planty.repository.PlantEnvStandardsRepository;
 import com.BioTy.Planty.repository.PlantStatusRepository;
 import com.BioTy.Planty.repository.SensorLogsRepository;
@@ -15,6 +12,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -43,8 +41,17 @@ public class PlantStatusService {
         List<String> actionTypes = determinAction(temperatureScore, lightScore, humidityScore);
         boolean actionNeeded = !actionTypes.isEmpty();
 
+        // * 최근 명령 수행이 10분 이내 종료됐다면 재실행 X
+        Optional<DeviceCommand> lastCommandOpt
+                = deviceCommandService.getLastCommand(userPlant.getId());
+        boolean preventAutoRetry = lastCommandOpt
+                .filter(cmd -> "DONE".equals(cmd.getStatus()))
+                .filter(cmd -> cmd.getWillBeTurnedOffAt() != null)
+                .map(cmd -> cmd.getWillBeTurnedOffAt().isAfter(LocalDateTime.now().minusMinutes(10)))
+                .orElse(false);
+
         // 4. 자동제어 여부에 따라 분기 처리
-        if (actionNeeded && userPlant.isAutoControlEnabled()) {
+        if (actionNeeded && userPlant.isAutoControlEnabled() && !preventAutoRetry) {
             deviceCommandService.executeCommands(userPlant, actionTypes);
         }
 
