@@ -18,6 +18,7 @@ public class DeviceCommandService {
     private final IotService iotService;
     private final DeviceCommandRepository commandRepository;
     private final ScheduledExecutorService commandScheduler;
+    private final PlantStatusService plantStatusService;
 
     public void executeCommands(UserPlant userPlant, List<String> actionTypes) {
         for (String actionType : actionTypes) {
@@ -59,9 +60,15 @@ public class DeviceCommandService {
 
                 commandScheduler.schedule(() -> {
                     try {
+                        // OFF 명령 전송
                         iotService.sendCommandToAdafruit(userPlant.getId(), userPlant.getUser().getId(), offAction);
+                        // 상태 변경
                         command.setStatus("DONE");
                         commandRepository.save(command);
+                        // 센서 데이터 재수집
+                        iotService.fetchAndSaveSensorLog(userPlant.getIotDevice().getId());
+                        // 상태 재평가 및 저장
+                        plantStatusService.evaluatePlantStatus(userPlant.getIotDevice().getId());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
