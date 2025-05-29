@@ -5,9 +5,9 @@ import lombok.Getter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Getter
-@AllArgsConstructor
 public class UserPlantSummaryResponseDto {
     private Long userPlantId;
     private String nickname;
@@ -16,6 +16,28 @@ public class UserPlantSummaryResponseDto {
 
     private Status status;
     private Personality personality;
+    private Map<String, Boolean> runningCommands;
+
+    public UserPlantSummaryResponseDto(
+            Long userPlantId,
+            String nickname,
+            String imageUrl,
+            LocalDate adoptedAt,
+            Status status,
+            Personality personality
+    ) {
+        this.userPlantId = userPlantId;
+        this.nickname = nickname;
+        this.imageUrl = imageUrl;
+        this.adoptedAt = adoptedAt;
+        this.status = status;
+        this.personality = personality;
+        this.runningCommands = null;
+    }
+
+    public void setRunningCommands(Map<String, Boolean> runningCommands) {
+        this.runningCommands = runningCommands;
+    }
 
     @Getter
     @AllArgsConstructor

@@ -14,14 +14,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Repository
 @RequiredArgsConstructor
 public class UserPlantRepositoryImpl implements UserPlantRepositoryCustom {
     @PersistenceContext
     private EntityManager em;
+
+    private final DeviceCommandRepository deviceCommandRepository;
 
     @Override
     public List<UserPlantSummaryResponseDto> findSummaryDtoByUserId(Long userId) {
@@ -54,24 +56,55 @@ public class UserPlantRepositoryImpl implements UserPlantRepositoryCustom {
                 .setParameter(1, userId)
                 .getResultList();
 
-        return rows.stream().map(row -> new UserPlantSummaryResponseDto(
-                ((Number) row[0]).longValue(),         // userPlantId
-                (String) row[1],                       // nickname
-                (String) row[2],                       // imageUrl
-                ((java.sql.Date) row[3]).toLocalDate(),// adoptedAt
-                new UserPlantSummaryResponseDto.Status(
-                        (Integer) row[4],
-                        (Integer) row[5],
-                        (Integer) row[6],
-                        (String) row[7],
-                        ((java.sql.Timestamp) row[8]).toLocalDateTime()
-                ),
-                new UserPlantSummaryResponseDto.Personality(
-                        (String) row[9],
-                        (String) row[10],
-                        (String) row[11]
-                )
-        )).toList();
+        List<Long> userPlantIds = rows.stream()
+                .map(row -> ((Number) row[0]).longValue())
+                .toList();
+
+        List<Object[]> commandRows
+                = deviceCommandRepository.findRunningCommandsByUserPlantIds(userPlantIds, LocalDateTime.now());
+
+        Map<Long, List<String>> runningMap = new HashMap<>();
+        for(Object[] row : commandRows) {
+            Long plantId = ((Number) row[0]).longValue();
+            String commandType = (String)row[1];
+            runningMap.computeIfAbsent(plantId, k -> new ArrayList<>()).add(commandType);
+        }
+
+        return rows.stream().map(row -> {
+            Long userPlantId = ((Number) row[0]).longValue();
+            UserPlantSummaryResponseDto dto = new UserPlantSummaryResponseDto(
+                    userPlantId,
+                    (String) row[1],                       // nickname
+                    (String) row[2],                       // imageUrl
+                    ((java.sql.Date) row[3]).toLocalDate(),// adoptedAt
+                    new UserPlantSummaryResponseDto.Status(
+                            (Integer) row[4],
+                            (Integer) row[5],
+                            (Integer) row[6],
+                            (String) row[7],
+                            ((java.sql.Timestamp) row[8]).toLocalDateTime()
+                    ),
+                    new UserPlantSummaryResponseDto.Personality(
+                            (String) row[9],
+                            (String) row[10],
+                            (String) row[11]
+                    )
+            );
+
+            Map<String, Boolean> commandStates = new HashMap<>();
+            commandStates.put("FAN", false);
+            commandStates.put("LIGHT", false);
+            commandStates.put("WATER", false);
+
+            if (runningMap.containsKey(userPlantId)) {
+                for (String cmd : runningMap.get(userPlantId)) {
+                    commandStates.put(cmd, true);
+                }
+            }
+
+            dto.setRunningCommands(commandStates);
+            return dto;
+        }).toList();
     }
 
     @Override
