@@ -140,8 +140,8 @@ public class UserPlantRepositoryImpl implements UserPlantRepositoryCustom {
 
               -- PlantEnvStandards
               pes.min_temperature, pes.max_temperature,
-              pes.min_humidity, pes.max_humidity,
               pes.min_light, pes.max_light,
+              pes.min_humidity, pes.max_humidity,
 
               -- PlantStatus (latest)
               ps.temperature_score, ps.light_score, ps.humidity_score, ps.status_message, ps.checked_at,
