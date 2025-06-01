@@ -76,6 +76,14 @@ public class UserPlantRepositoryImpl implements UserPlantRepositoryCustom {
 
         return rows.stream().map(row -> {
             Long userPlantId = ((Number) row[0]).longValue();
+            java.sql.Timestamp checkedAtTs = null;
+            try {
+                checkedAtTs = (java.sql.Timestamp) row[8];
+            } catch (ClassCastException e) {
+                System.err.println("checkedAt 캐스팅 에러: " + row[8]);
+            }
+            LocalDateTime checkedAt = (checkedAtTs != null) ? checkedAtTs.toLocalDateTime() : null;
+
             UserPlantSummaryResponseDto dto = new UserPlantSummaryResponseDto(
                     userPlantId,
                     (String) row[1],                       // nickname
@@ -86,7 +94,7 @@ public class UserPlantRepositoryImpl implements UserPlantRepositoryCustom {
                             (Integer) row[5],
                             (Integer) row[6],
                             (String) row[7],
-                            ((java.sql.Timestamp) row[8]).toLocalDateTime()
+                            checkedAt
                     ),
                     new UserPlantSummaryResponseDto.Personality(
                             (String) row[9],
