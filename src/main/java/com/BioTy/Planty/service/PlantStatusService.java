@@ -93,7 +93,7 @@ public class PlantStatusService {
 
     // 임시 메시지 (추후 AI 연동 - 성격에 맞게 변경)
     private String createStatusMessage(int temp, int light, int humid) {
-        if (temp + light + humid == 3) return "모든 환경이 아주 좋아요!";
+        if (temp + light + humid == 9) return "모든 환경이 아주 좋아요!";
         if (temp == 0) return "온도가 적절하지 않아요!";
         if (light == 0) return "빛이 부족해요. 햇볕이 필요해요!";
         if (humid == 0) return "습도가 너무 낮아요. 물이 필요해요!";
