@@ -25,6 +25,10 @@ public class DeviceCommandService {
         for (String actionType : actionTypes) {
             try {
                 String action = actionType.toUpperCase();
+                if (action.equals("REFRESH")) {
+                    iotService.sendCommandToAdafruit(userPlant.getId(), userPlant.getUser().getId(), "REFRESH");
+                    continue;
+                }
                 String onAction = action + "_ON";
                 String offAction = action + "_OFF";
 
