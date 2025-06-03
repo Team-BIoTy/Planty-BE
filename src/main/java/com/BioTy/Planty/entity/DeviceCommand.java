@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -23,4 +24,7 @@ public class DeviceCommand {
 
     private String commandType; // WATER, LIGHT, FAN
     private LocalDateTime sentAt;
+
+    private String status; // RUNNING(기본값), DONE(자동종료), CANCELLED(수동종료)
+    private LocalDateTime willBeTurnedOffAt;
 }

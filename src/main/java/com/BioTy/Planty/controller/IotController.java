@@ -3,8 +3,11 @@ package com.BioTy.Planty.controller;
 import com.BioTy.Planty.dto.iot.ActionRequestDto;
 import com.BioTy.Planty.dto.iot.IotDeviceResponseDto;
 import com.BioTy.Planty.entity.IotDevice;
+import com.BioTy.Planty.entity.UserPlant;
 import com.BioTy.Planty.service.AuthService;
+import com.BioTy.Planty.service.DeviceCommandService;
 import com.BioTy.Planty.service.IotService;
+import com.BioTy.Planty.service.UserPlantService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -23,6 +26,8 @@ import java.util.stream.Collectors;
 public class IotController {
     private final IotService iotService;
     private final AuthService authService;
+    private final UserPlantService userPlantService;
+    private final DeviceCommandService deviceCommandService;
 
     @Operation(
             summary = "사용자의 IoT 기기 목록 조회",
@@ -65,8 +70,20 @@ public class IotController {
     ) {
         token = token.replace("Bearer ", "");
         Long userId = authService.getUserIdFromToken(token);
-
-        iotService.sendCommandToAdafruit(userPlantId, userId, request.getType());
+        UserPlant userPlant = userPlantService.getUserPlantEntity(userPlantId, userId);
+        deviceCommandService.executeCommands(userPlant, List.of(request.getType()));
         return ResponseEntity.ok().build();
     }
+
+    @PatchMapping("/commands/{commandId}/cancel")
+    @Operation(summary = "명령 취소", description = "사용자가 진행 중인 명령을 중단합니다.")
+    public ResponseEntity<Void> cancelCommand(
+            @PathVariable Long commandId,
+            @Parameter(hidden = true) @RequestHeader("Authorization") String token
+    ) {
+        Long userId = authService.getUserIdFromToken(token.replace("Bearer ", ""));
+        deviceCommandService.cancelCommand(commandId, userId);
+        return ResponseEntity.ok().build();
+    }
+
 }
