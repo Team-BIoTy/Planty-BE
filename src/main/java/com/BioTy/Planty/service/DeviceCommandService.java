@@ -57,8 +57,8 @@ public class DeviceCommandService {
 
                 // 4. 지속시간 후 OFF
                 long delaySeconds = switch (action) {
-                    case "WATER" -> 30;
-                    case "FAN" -> 300;
+                    case "WATER" -> 3;
+                    case "FAN" -> 30;
                     case "LIGHT" -> 300;
                     default -> 0;
                 };
