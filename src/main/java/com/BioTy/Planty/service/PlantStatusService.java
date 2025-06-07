@@ -33,9 +33,9 @@ public class PlantStatusService {
                 .orElseThrow(() -> new RuntimeException("환경 기준 없음"));
 
         // 2. 센서값과 환경 기준 비교해 점수 계산 & 상태메시지 생성
-        int temperatureScore = calcScore(latestLog.getTemperature(), standards.getMinTemperature(), standards.getMaxTemperature());
-        int lightScore = calcScore(latestLog.getLight(), standards.getMinLight(), standards.getMaxLight());
-        int humidityScore = calcScore(latestLog.getHumidity(), standards.getMinHumidity(), standards.getMaxHumidity());
+        int temperatureScore = calcScore(latestLog.getTemperature(), standards.getMinTemperature(), standards.getMaxTemperature(), "TEMP");
+        int lightScore = calcScore(latestLog.getLight(), standards.getMinLight(), standards.getMaxLight(), "LIGHT");
+        int humidityScore = calcScore(latestLog.getHumidity(), standards.getMinHumidity(), standards.getMaxHumidity(), "HUMID");
         String msg = createStatusMessage(temperatureScore, lightScore, humidityScore);
 
         // 3. 명령 판단
@@ -70,14 +70,32 @@ public class PlantStatusService {
                 : List.of(); // 자동 제어 안함 or 쿨타임
     }
 
-    private int calcScore(BigDecimal value, int min, int max){
+    public String getLastStatusMessage(Long userPlantId) {
+        return plantStatusRepository.findTopByUserPlant_IdOrderByCheckedAtDesc(userPlantId)
+                .map(PlantStatus::getStatusMessage)
+                .orElse("식물 상태 정보를 확인할 수 없습니다.");
+    }
+
+    private int calcScore(BigDecimal value, int min, int max, String type) {
         BigDecimal minVal = BigDecimal.valueOf(min);
         BigDecimal maxVal = BigDecimal.valueOf(max);
 
-        if (value.compareTo(minVal) < 0 || value.compareTo(maxVal) > 0) {
-            return 0; // 기준 벗어나면 0점
+        // 기준 벗어난 경우
+        if (value.compareTo(minVal) < 0) {
+            if (type.equals("HUMID") || type.equals("LIGHT")) {
+                return 0; // 제어 가능 방향: 낮음
+            }
+            return 1; // 낮지만 제어는 안됨 → 점수 낮게
         }
 
+        if (value.compareTo(maxVal) > 0) {
+            if (type.equals("TEMP")) {
+                return 0; // 제어 가능 방향: 높음
+            }
+            return 1; // 높지만 제어 불가 → 낮은 점수
+        }
+
+        // 기준 안이면 거리 기반 점수 (1~3점)
         BigDecimal range = maxVal.subtract(minVal);
         BigDecimal third = range.divide(BigDecimal.valueOf(3), 2, BigDecimal.ROUND_HALF_UP);
         BigDecimal fromMin = value.subtract(minVal);
@@ -91,7 +109,6 @@ public class PlantStatusService {
         }
     }
 
-    // 임시 메시지 (추후 AI 연동 - 성격에 맞게 변경)
     private String createStatusMessage(int temp, int light, int humid) {
         if (temp + light + humid == 9) return "모든 환경이 아주 좋아요!";
         if (temp == 0) return "온도가 적절하지 않아요!";
