@@ -48,7 +48,8 @@ public class FCMService {
                 .build();
         Message message = Message.builder()
                 .setToken(targetToken)
-                .setNotification(notification)
+                .putData("title", title)
+                .putData("body", body)
                 .build();
         try {
             String response = firebaseMessaging.send(message);

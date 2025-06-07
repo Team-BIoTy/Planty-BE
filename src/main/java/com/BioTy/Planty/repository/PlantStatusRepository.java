@@ -8,4 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface PlantStatusRepository extends JpaRepository<PlantStatus, Long> {
+    Optional<PlantStatus> findTopByUserPlant_IdOrderByCheckedAtDesc(Long userPlantId);
 }
