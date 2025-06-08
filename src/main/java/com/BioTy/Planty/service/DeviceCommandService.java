@@ -38,8 +38,8 @@ public class DeviceCommandService {
                 // 2. 명령 지속시간 계산
                 LocalDateTime now = LocalDateTime.now();
                 LocalDateTime willEndAt = switch (action) {
-                    case "WATER" -> now.plusSeconds(30);
-                    case "FAN" -> now.plusMinutes(5);
+                    case "WATER" -> now.plusSeconds(3);
+                    case "FAN" -> now.plusSeconds(30);
                     case "LIGHT" -> now.plusMinutes(5);
                     default -> now.plusSeconds(0);
                 };
@@ -57,8 +57,8 @@ public class DeviceCommandService {
 
                 // 4. 지속시간 후 OFF
                 long delaySeconds = switch (action) {
-                    case "WATER" -> 30;
-                    case "FAN" -> 300;
+                    case "WATER" -> 3;
+                    case "FAN" -> 30;
                     case "LIGHT" -> 300;
                     default -> 0;
                 };
@@ -70,10 +70,15 @@ public class DeviceCommandService {
                         // 상태 변경
                         command.setStatus("DONE");
                         commandRepository.save(command);
-                        // 센서 데이터 재수집
-                        iotService.fetchAndSaveSensorLog(userPlant.getIotDevice().getId());
-                        // 상태 재평가 및 저장
-                        plantStatusService.evaluatePlantStatus(userPlant.getIotDevice().getId());
+                        // OFF 이후 10초 뒤 센서 재수집 & 상태 재평가
+                        commandScheduler.schedule(() -> {
+                            try {
+                                iotService.fetchAndSaveSensorLog(userPlant.getIotDevice().getId());
+                                plantStatusService.evaluatePlantStatus(userPlant.getIotDevice().getId());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }, 10, TimeUnit.SECONDS);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

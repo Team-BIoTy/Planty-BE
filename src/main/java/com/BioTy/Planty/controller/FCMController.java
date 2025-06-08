@@ -34,16 +34,4 @@ public class FCMController {
         fcmService.saveOrUpdateToken(userId, request.getToken());
         return ResponseEntity.ok().build();
     }
-
-    @PostMapping("/send")
-    @Operation(
-            summary = "푸시 알림 테스트 전송",
-            description = "디바이스 토큰을 이용해 알림을 직접 전송합니다."
-    )
-    public ResponseEntity<Void> sendNotification(
-            @RequestBody SendNotificationRequestDto request
-            ){
-        fcmService.sendMessage(request.getTargetToken(), request.getTitle(), request.getBody());
-        return ResponseEntity.ok().build();
-    }
 }
