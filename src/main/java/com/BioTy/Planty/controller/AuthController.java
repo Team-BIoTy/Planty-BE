@@ -76,4 +76,23 @@ public class AuthController {
         }
     }
 
+    // 5. 회원 탈퇴
+    @Operation(summary = "회원 탈퇴", description = "현재 로그인한 사용자를 탈퇴시킵니다.",
+            security = @SecurityRequirement(name = "bearerAuth"))
+    @DeleteMapping("/withdraw")
+    public ResponseEntity<?> withdraw(
+            @Parameter(hidden = true)
+            @RequestHeader("Authorization") String token
+    ) {
+        try {
+            token = token.replace("Bearer ", "");
+            Long userId = authService.getUserIdFromToken(token);
+            authService.deleteUser(userId);
+            return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+
 }
