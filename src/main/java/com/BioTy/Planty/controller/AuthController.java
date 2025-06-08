@@ -1,16 +1,17 @@
 package com.BioTy.Planty.controller;
 
+import com.BioTy.Planty.dto.user.ChangePasswordRequestDto;
 import com.BioTy.Planty.dto.user.LoginRequestDto;
 import com.BioTy.Planty.dto.user.LoginResponseDto;
 import com.BioTy.Planty.dto.user.SignupRequestDto;
 import com.BioTy.Planty.security.JwtUtil;
 import com.BioTy.Planty.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -54,4 +55,25 @@ public class AuthController {
         }
         return ResponseEntity.ok().build();
     }
+
+    // 4. 비밀번호 변경
+    @Operation(summary = "비밀번호 변경", description = "비밀번호를 변경합니다.",
+            security = @SecurityRequirement(name = "bearerAuth"))
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(
+            @Parameter(hidden = true)
+            @RequestHeader("Authorization") String token,
+            @RequestBody ChangePasswordRequestDto request
+    ) {
+        try {
+            token = token.replace("Bearer ", "");
+            Long userId = authService.getUserIdFromToken(token);
+
+            authService.changePassword(userId, request.getCurrentPassword(), request.getNewPassword());
+            return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        }
+    }
+
 }
