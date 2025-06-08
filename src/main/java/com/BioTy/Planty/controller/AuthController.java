@@ -83,7 +83,7 @@ public class AuthController {
     // 5. 회원 탈퇴
     @Operation(summary = "회원 탈퇴", description = "현재 로그인한 사용자를 탈퇴시킵니다.",
             security = @SecurityRequirement(name = "bearerAuth"))
-    @DeleteMapping("/withdraw")
+    @DeleteMapping("/delete")
     public ResponseEntity<?> withdraw(
             @Parameter(hidden = true)
             @RequestHeader("Authorization") String token
