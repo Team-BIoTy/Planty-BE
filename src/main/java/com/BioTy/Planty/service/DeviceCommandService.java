@@ -70,10 +70,15 @@ public class DeviceCommandService {
                         // 상태 변경
                         command.setStatus("DONE");
                         commandRepository.save(command);
-                        // 센서 데이터 재수집
-                        iotService.fetchAndSaveSensorLog(userPlant.getIotDevice().getId());
-                        // 상태 재평가 및 저장
-                        plantStatusService.evaluatePlantStatus(userPlant.getIotDevice().getId());
+                        // OFF 이후 10초 뒤 센서 재수집 & 상태 재평가
+                        commandScheduler.schedule(() -> {
+                            try {
+                                iotService.fetchAndSaveSensorLog(userPlant.getIotDevice().getId());
+                                plantStatusService.evaluatePlantStatus(userPlant.getIotDevice().getId());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }, 10, TimeUnit.SECONDS);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
