@@ -1,7 +1,7 @@
 package com.BioTy.Planty.config;
 
+import com.BioTy.Planty.entity.User;
 import com.BioTy.Planty.entity.UserPlant;
-import com.BioTy.Planty.repository.SensorLogsRepository;
 import com.BioTy.Planty.repository.UserDeviceTokenRepository;
 import com.BioTy.Planty.repository.UserPlantRepository;
 import com.BioTy.Planty.service.DeviceCommandService;
@@ -33,6 +33,7 @@ public class SensorFetchScheduler {
         for (UserPlant plant : allPlants) {
             if (plant.getIotDevice() == null) continue;
             Long deviceId = plant.getIotDevice().getId();
+            User user = plant.getUser();
 
             // 1. 센서 데이터 패치
             iotService.fetchAndSaveSensorLog(deviceId);
@@ -46,6 +47,8 @@ public class SensorFetchScheduler {
                 userDeviceTokenRepository.findByUser(plant.getUser()).ifPresent(token -> {
                     log.info("🔥 FCM 발송 → {}", statusMsg);
                     fcmService.sendMessage(
+                            user,
+                            plant,
                             token.getToken(),
                             "🌱식물 상태 알림",
                             statusMsg
@@ -59,6 +62,8 @@ public class SensorFetchScheduler {
                 deviceCommandService.executeCommands(plant, actions);
                 userDeviceTokenRepository.findByUser(plant.getUser()).ifPresent(token -> {
                     fcmService.sendMessage(
+                            user,
+                            plant,
                             token.getToken(),
                             "🌱자동제어가 작동했어요!",
                             statusMsg

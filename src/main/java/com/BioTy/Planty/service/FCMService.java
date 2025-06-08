@@ -2,16 +2,19 @@ package com.BioTy.Planty.service;
 
 import com.BioTy.Planty.entity.User;
 import com.BioTy.Planty.entity.UserDeviceToken;
+import com.BioTy.Planty.entity.UserNotification;
+import com.BioTy.Planty.entity.UserPlant;
 import com.BioTy.Planty.repository.UserDeviceTokenRepository;
+import com.BioTy.Planty.repository.UserNotificationRepository;
 import com.BioTy.Planty.repository.UserRepository;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
-import com.google.firebase.messaging.Notification;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -21,6 +24,7 @@ public class FCMService {
     private final UserDeviceTokenRepository tokenRepository;
     private final UserRepository userRepository;
     private final FirebaseMessaging firebaseMessaging;
+    private final UserNotificationRepository userNotificationRepository;
 
     // 유저 ID 기준으로 FCM 토큰 저장 또는 수정
     @Transactional
@@ -41,11 +45,7 @@ public class FCMService {
     }
 
     // 전달받은 디바이스 토큰에 푸시 메시지 전송
-    public void sendMessage(String targetToken, String title, String body){
-        Notification notification = Notification.builder()
-                .setTitle(title)
-                .setBody(body)
-                .build();
+    public void sendMessage(User user, UserPlant userPlant, String targetToken, String title, String body){
         Message message = Message.builder()
                 .setToken(targetToken)
                 .putData("title", title)
@@ -57,6 +57,14 @@ public class FCMService {
         } catch (Exception e) {
             log.error("FCM 메시지 전송 실패: {}", e);
         }
+
+        userNotificationRepository.save(UserNotification.builder()
+                .user(user)
+                .userPlant(userPlant)
+                .title(title)
+                .body(body)
+                .receivedAt(LocalDateTime.now())
+                .build());
     }
 
 }
