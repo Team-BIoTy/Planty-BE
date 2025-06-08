@@ -26,6 +26,7 @@ public class SecurityConfig {
                                 "/chats/**",
                                 "/fcm/**",
                                 "/test/**",
+                                "/notifications/**",
 
                                 // Swagger 경로들
                                 "/swagger-ui/**",
