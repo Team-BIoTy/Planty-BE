@@ -73,4 +73,10 @@ public class AuthService {
         userRepository.delete(user);
     }
 
+    // 6. 유저 정보 불러오기
+    public User getUserInfo(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+    }
+
 }
