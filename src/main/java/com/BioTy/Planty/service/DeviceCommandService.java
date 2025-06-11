@@ -73,6 +73,11 @@ public class DeviceCommandService {
                         // OFF 이후 10초 뒤 센서 재수집 & 상태 재평가
                         commandScheduler.schedule(() -> {
                             try {
+                                iotService.sendCommandToAdafruit(
+                                        userPlant.getId(),
+                                        userPlant.getUser().getId(),
+                                        "REFRESH"
+                                );
                                 iotService.fetchAndSaveSensorLog(userPlant.getIotDevice().getId());
                                 plantStatusService.evaluatePlantStatus(userPlant.getIotDevice().getId());
                             } catch (Exception e) {
