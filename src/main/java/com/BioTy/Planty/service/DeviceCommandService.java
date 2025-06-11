@@ -40,7 +40,7 @@ public class DeviceCommandService {
                 LocalDateTime willEndAt = switch (action) {
                     case "WATER" -> now.plusSeconds(3);
                     case "FAN" -> now.plusSeconds(30);
-                    case "LIGHT" -> now.plusMinutes(5);
+                    case "LIGHT" -> now.plusSeconds(30);
                     default -> now.plusSeconds(0);
                 };
 
@@ -59,7 +59,7 @@ public class DeviceCommandService {
                 long delaySeconds = switch (action) {
                     case "WATER" -> 3;
                     case "FAN" -> 30;
-                    case "LIGHT" -> 300;
+                    case "LIGHT" -> 30;
                     default -> 0;
                 };
 
@@ -73,6 +73,11 @@ public class DeviceCommandService {
                         // OFF 이후 10초 뒤 센서 재수집 & 상태 재평가
                         commandScheduler.schedule(() -> {
                             try {
+                                iotService.sendCommandToAdafruit(
+                                        userPlant.getId(),
+                                        userPlant.getUser().getId(),
+                                        "REFRESH"
+                                );
                                 iotService.fetchAndSaveSensorLog(userPlant.getIotDevice().getId());
                                 plantStatusService.evaluatePlantStatus(userPlant.getIotDevice().getId());
                             } catch (Exception e) {

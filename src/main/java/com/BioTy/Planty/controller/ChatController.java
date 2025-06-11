@@ -82,6 +82,7 @@ public class ChatController {
         ChatMessageResponseDto response = chatService.sendMessage(
                 chatRoomId,
                 request.getMessage(),
+                request.getPlantInfo(),
                 request.getSensorLogId(),
                 request.getPlantEnvStandardsId(),
                 request.getPersona()

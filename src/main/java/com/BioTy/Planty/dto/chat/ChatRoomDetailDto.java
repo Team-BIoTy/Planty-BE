@@ -1,5 +1,6 @@
 package com.BioTy.Planty.dto.chat;
 
+import com.BioTy.Planty.entity.PlantInfo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,4 +21,5 @@ public class ChatRoomDetailDto {
     private Long sensorLogId;
     private Long plantEnvStandardsId;
     private List<ChatMessageResponseDto> messages;
+    private PlantInfo plantInfo;
 }
