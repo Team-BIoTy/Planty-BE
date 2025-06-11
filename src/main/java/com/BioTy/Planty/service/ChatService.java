@@ -111,6 +111,11 @@ public class ChatService {
                 ))
                 .collect(Collectors.toList());
 
+        PlantInfo plantInfo = null;
+        if (userPlant != null) {
+            plantInfo = userPlant.getPlantInfo();
+        }
+
         return new ChatRoomDetailDto(
                 chatRoomId,
                 userPlant.getId(),
@@ -121,13 +126,14 @@ public class ChatService {
                 personalityColor,
                 sensorLogId,
                 plantEnvStandardsId,
-                messages
+                messages,
+                plantInfo
         );
     }
 
 
     // 4. 메시지 전송
-    public ChatMessageResponseDto sendMessage(Long chatRoomId, String message,
+    public ChatMessageResponseDto sendMessage(Long chatRoomId, String message, PlantInfo info,
                                               Long sensorLogId, Long plantEnvStandardsId, String persona) {
         // 1) 사용자 메시지 저장
         ChatMessage userMsg = chatMessageRepository.save(
@@ -145,6 +151,61 @@ public class ChatService {
             requestBody.put("plant_env_standards_id", plantEnvStandardsId);
             requestBody.put("persona", persona);
             requestBody.put("user_input", message);
+
+            Map<String, Object> plantInfo = new HashMap<>();
+            PlantInfo plant = info;
+
+            if (plant != null) {
+                plantInfo.put("id", plant.getId());
+                plantInfo.put("imageUrl", plant.getImageUrl());
+                plantInfo.put("commonName", plant.getCommonName());
+                plantInfo.put("scientificName", plant.getScientificName());
+                plantInfo.put("englishName", plant.getEnglishName());
+                plantInfo.put("tradeName", plant.getTradeName());
+                plantInfo.put("familyName", plant.getFamilyName());
+                plantInfo.put("origin", plant.getOrigin());
+                plantInfo.put("careTip", plant.getCareTip());
+
+                plantInfo.put("category", plant.getCategory());
+                plantInfo.put("growthForm", plant.getGrowthForm());
+                plantInfo.put("growthHeight", plant.getGrowthHeight());
+                plantInfo.put("growthWidth", plant.getGrowthWidth());
+                plantInfo.put("indoorGardenUse", plant.getIndoorGardenUse());
+                plantInfo.put("ecologicalType", plant.getEcologicalType());
+                plantInfo.put("leafShape", plant.getLeafShape());
+                plantInfo.put("leafPattern", plant.getLeafPattern());
+                plantInfo.put("leafColor", plant.getLeafColor());
+
+                plantInfo.put("floweringSeason", plant.getFloweringSeason());
+                plantInfo.put("flowerColor", plant.getFlowerColor());
+                plantInfo.put("fruitingSeason", plant.getFruitingSeason());
+                plantInfo.put("fruitColor", plant.getFruitColor());
+                plantInfo.put("fragrance", plant.getFragrance());
+                plantInfo.put("propagationMethod", plant.getPropagationMethod());
+                plantInfo.put("propagationSeason", plant.getPropagationSeason());
+
+                plantInfo.put("careLevel", plant.getCareLevel());
+                plantInfo.put("careDifficulty", plant.getCareDifficulty());
+                plantInfo.put("lightRequirement", plant.getLightRequirement());
+                plantInfo.put("placement", plant.getPlacement());
+                plantInfo.put("growthRate", plant.getGrowthRate());
+                plantInfo.put("optimalTemperature", plant.getOptimalTemperature());
+                plantInfo.put("minWinterTemperature", plant.getMinWinterTemperature());
+                plantInfo.put("humidity", plant.getHumidity());
+                plantInfo.put("fertilizer", plant.getFertilizer());
+                plantInfo.put("soilType", plant.getSoilType());
+
+                plantInfo.put("wateringSpring", plant.getWateringSpring());
+                plantInfo.put("wateringSummer", plant.getWateringSummer());
+                plantInfo.put("wateringAutumn", plant.getWateringAutumn());
+                plantInfo.put("wateringWinter", plant.getWateringWinter());
+                plantInfo.put("pestsDiseases", plant.getPestsDiseases());
+
+                plantInfo.put("functionalInfo", plant.getFunctionalInfo());
+            }
+
+            requestBody.put("plant_info", plantInfo);
+
 
             System.out.println("🔍 [Agent 요청] " + requestBody);
 
