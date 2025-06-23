@@ -1,4 +1,33 @@
+<img alt="spring boot" src="https://img.shields.io/badge/springboot-6DB33F.svg?style=for-the-badge&logo=springboot&logoColor=white" height="20"/> <img alt="java" src="https://img.shields.io/badge/java-007396.svg?style=for-the-badge&logo=java&logoColor=white" height="20"/> <img alt="mysql" src="https://img.shields.io/badge/mysql-4479A1.svg?style=for-the-badge&logo=mysql&logoColor=white" height="20"/>
+
 # 🌱 Planty Backend
+
+**Planty Project**에서 사용하는 SpringBoot 기반 백엔드 API 서버 레포지토리입니다.<br>
+Adafruit IO를 통해 식물의 센서 데이터를 주기적으로 수집하고, 식물 상태를 평가해 자동/수동으로 IoT 제어를 수행합니다. Firebase 기반 푸시 알림 전송, FastAPI 챗봇 연동 등 다양한 기능을 제공합니다.
+
+### 프로젝트 개요
+- **전체 개발 기간**: 2025.04.01 - 2025.06.11
+    - ERD 및 API 설계: 2025.04.01 - 2025.04.09
+    - 기능 개발: 2025.04.10 - 2025.06.11
+        - 4월: 회원가입/로그인, 식물 등록, 홈(식물 목록 제공)
+        - 5월: 식물 상세 리포트, 챗봇, IoT 연동, FastAPI 서버 연동 
+        - 6월: IoT 제어로직 개선, FCM 푸시 알림, 마이페이지
+
+<br>
+
+### 📌 기술 스택
+이 프로젝트는 아래 환경에서 개발되었습니다.
+
+|분야| 기술                            |
+|--|-------------------------------|
+|Backend Framework| Spring Boot 3.4.4             |
+|언어| Java 17.0.15                         |
+|DB| MySQL 9.3.0                   |
+|인증| JWT                           |
+|외부 연동| Adafruit IO, Firebase Admin SDK |
+|문서화| Springdoc OpenAPI (Swagger UI) |
+
+
 ### 📁 프로젝트 구조
 ```
 Planty-BE
