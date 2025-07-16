@@ -67,7 +67,7 @@ public class UserPlantController {
     )
     @PostMapping("/{userPlantId}/device")
     public ResponseEntity<Void> registerIotDevice(
-            @Parameter(description = "반려식물 ID") @PathVariable Long userPlantId,
+            @Parameter(description = "반려식물 ID") @PathVariable("userPlantId") Long userPlantId,
             @RequestBody RegisterDeviceRequestDto requestDto
     ){
         userPlantService.registerDevice(userPlantId, requestDto.getIotDeviceId());
@@ -79,7 +79,7 @@ public class UserPlantController {
             summary = "반려식물 상세 조회",
             description = "userPlantId를 이용해 반려식물의 상세 정보를 조회합니다.")
     @GetMapping("/{userPlantId}")
-    public UserPlantDetailResponseDto getUserPlantDetail(@PathVariable Long userPlantId) {
+    public UserPlantDetailResponseDto getUserPlantDetail(@PathVariable("userPlantId") Long userPlantId) {
         return userPlantService.getUserPlantDetail(userPlantId);
     }
 
@@ -89,7 +89,7 @@ public class UserPlantController {
             description = "userPlantId를 이용해 반려식물을 삭제합니다. (연결된 IoT 디바이스도 자동으로 해제)")
     @DeleteMapping("/{userPlantId}")
     public ResponseEntity<Void> deleteUserPlant(
-            @PathVariable Long userPlantId,
+            @PathVariable("userPlantId") Long userPlantId,
             @Parameter(hidden = true) @RequestHeader("Authorization") String token
     ){
         token = token.replace("Bearer ", "");
@@ -105,7 +105,7 @@ public class UserPlantController {
             description = "수정을 위한 반려식물의 정보를 조회합니다.")
     @GetMapping("/edit/{userPlantId}")
     public UserPlantEditDto getUserPlantForEdit(
-            @PathVariable Long userPlantId,
+            @PathVariable("userPlantId") Long userPlantId,
             @Parameter(hidden = true) @RequestHeader("Authorization") String token
     ) {
         token = token.replace("Bearer ", "");
@@ -120,7 +120,7 @@ public class UserPlantController {
             description = "반려식물의 정보를 수정합니다.")
     @PutMapping("/edit/{userPlantId}")
     public ResponseEntity<Void> editUserPlant(
-            @PathVariable Long userPlantId,
+            @PathVariable("userPlantId") Long userPlantId,
             @RequestBody UserPlantEditDto requestDto,
             @Parameter(hidden = true) @RequestHeader("Authorization") String token
     ){

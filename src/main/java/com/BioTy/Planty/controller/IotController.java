@@ -64,7 +64,7 @@ public class IotController {
     )
     @PostMapping("/{userPlantId}/actions")
     public ResponseEntity<Void> sendActionToAdafruit(
-            @Parameter(description = "반려식물 ID") @PathVariable Long userPlantId,
+            @Parameter(description = "반려식물 ID") @PathVariable("userPlantId") Long userPlantId,
             @RequestBody ActionRequestDto request,
             @Parameter(hidden = true) @RequestHeader("Authorization") String token
     ) {
@@ -78,7 +78,7 @@ public class IotController {
     @PatchMapping("/commands/{commandId}/cancel")
     @Operation(summary = "명령 취소", description = "사용자가 진행 중인 명령을 중단합니다.")
     public ResponseEntity<Void> cancelCommand(
-            @PathVariable Long commandId,
+            @PathVariable("commandId") Long commandId,
             @Parameter(hidden = true) @RequestHeader("Authorization") String token
     ) {
         Long userId = authService.getUserIdFromToken(token.replace("Bearer ", ""));

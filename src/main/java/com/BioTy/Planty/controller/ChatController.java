@@ -63,7 +63,7 @@ public class ChatController {
             description = "채팅방 정보 및 메시지 목록을 함께 조회",
             security = @SecurityRequirement(name = "bearerAuth")
     )
-    public ResponseEntity<ChatRoomDetailDto> getChatRoomDetail(@PathVariable Long chatRoomId) {
+    public ResponseEntity<ChatRoomDetailDto> getChatRoomDetail(@PathVariable("chatRoomId") Long chatRoomId) {
         ChatRoomDetailDto response = chatService.getChatRoomDetail(chatRoomId);
         return ResponseEntity.ok(response);
     }
@@ -76,7 +76,7 @@ public class ChatController {
             security = @SecurityRequirement(name = "bearerAuth")
     )
     public ResponseEntity<ChatMessageResponseDto> sendMessage(
-            @PathVariable Long chatRoomId,
+            @PathVariable("chatRoomId") Long chatRoomId,
             @RequestBody SendMessageRequestDto request
             ){
         ChatMessageResponseDto response = chatService.sendMessage(

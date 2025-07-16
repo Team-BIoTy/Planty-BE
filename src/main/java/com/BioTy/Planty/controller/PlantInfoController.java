@@ -31,7 +31,7 @@ public class PlantInfoController {
 
     @Operation(summary = "도감 식물 상세 정보 조회", description = "선택한 식물의 상세 정보를 조회합니다.")
     @GetMapping("/{plantId}")
-    public PlantInfoDetailResponseDto getPlantDetail(@PathVariable Long plantId) {
+    public PlantInfoDetailResponseDto getPlantDetail(@PathVariable("plantId") Long plantId) {
         return plantInfoService.getPlantInfoDetail(plantId);
     }
 }
