@@ -113,7 +113,7 @@ jwt:
 - 식물별 환경 기준 (`plant_env_standards`)
 - 식물 성격 정보 (`personality`)
 
-`/planty-db/` 폴더에 있는 SQL 파일을 MySQL DB에 import 해주세요.
+`src/main/resources/planty-db/` 폴더에 있는 SQL 파일을 MySQL DB에 import 해주세요.
 
 ### 📍 application.yml 작성 예시
 
