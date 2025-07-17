@@ -66,7 +66,7 @@ Planty 백엔드의 핵심 기능은 다음과 같습니다.
 - [OpenJDK 17](https://jdk.java.net/java-se-ri/17)
 - 설치 후, `java --version`으로 정상 설치 확인
 
-### 2. MySQL 설치 및 초기 데이터 세팅
+### 2. MySQL 설치
 
 - MySQL 8.0 이상 설치 
 - root 계정 비밀번호 설정 
@@ -103,8 +103,17 @@ JWT 토큰 생성을 위해 랜덤 문자열을 jwt.secret에 입력합니다.
 jwt:
   secret: planty-secure-key-123456789 # 예시
   expiration: 3600000 # 1시간
-
 ```
+
+### 6. 초기 데이터 삽입
+
+다음 3개의 테이블은 시스템 동작을 위해 반드시 초기 데이터가 필요합니다.
+
+- 식물 종류 정보 (`plant_info`)
+- 식물별 환경 기준 (`plant_env_standards`)
+- 식물 성격 정보 (`personality`)
+
+`/planty-db/` 폴더에 있는 SQL 파일을 MySQL DB에 import 해주세요.
 
 ### 📍 application.yml 작성 예시
 
