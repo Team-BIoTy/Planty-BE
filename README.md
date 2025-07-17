@@ -63,22 +63,94 @@ Planty 백엔드의 핵심 기능은 다음과 같습니다.
 
 ### 1. JDK 17 설치
 
+- [OpenJDK 17](https://jdk.java.net/java-se-ri/17)
+- 설치 후, `java --version`으로 정상 설치 확인
+
 ### 2. MySQL 설치 및 초기 데이터 세팅
 
-### 3. `application.yml` 설정
+- MySQL 8.0 이상 설치 
+- root 계정 비밀번호 설정 
+- `planty` DB 생성
 
-`src/main/resources/application.yml`에 직접 발급받은 키와 비밀번호에 맞게 수정하여 아래의 내용을 추가합니다.
+### 3. Adafruit IO 연동 설정
 
-```
-aa
-```
+1. https://io.adafruit.com 회원가입 및 로그인
+2. My Key 메뉴에서 AIO Key와 Username 확인
+3. Feeds 메뉴에서 아래 이름으로 피드 3개 생성
+- planty.temperature
+- planty.soilmoisture
+- planty.lightintensity
+
+> 위 정보는 application.yml의 adafruit.api.key, username, feed.key 항목에 사용됩니다.
 
 ### 4. Firebase Admin SDK 설정
 
-- Firebase 콘솔 접속 → 서비스 계정 → 새 비공개 키 발급
-- 발급받은 Json 파일을 `src/main/resources/firebase/firebase-adminsdk.json` 경로에 저장
+1. Firebase 콘솔에서 새 프로젝트 생성
+2. 설정 > 서비스 계정 탭으로 이동
+3. "새 비공개 키 발급" 버튼 클릭 → JSON 파일 다운로드 
+4. 다운로드한 JSON 파일을 다음 경로에 저장
+```
+src/main/resources/firebase/<planty-firebase-adminsdk-xxx.json>
+```
 
-<br>
+> 이 JSON 파일은 민감 정보가 포함되므로 .gitignore에 추가해야 합니다.
+
+### 5. JWT 비밀키 설정
+
+JWT 토큰 생성을 위해 랜덤 문자열을 jwt.secret에 입력합니다.
+
+```
+jwt:
+  secret: planty-secure-key-123456789 # 예시
+  expiration: 3600000 # 1시간
+
+```
+
+### 📍 application.yml 작성 예시
+
+`src/main/resources/application.yml` 파일을 생성하고, 아래 예시를 참고해 설정해주세요. <br>
+모든 키 값은 직접 발급받은 정보(1-5번에서 설정한 값들)로 교체해야 합니다.
+
+```
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/planty?serverTimezone=Asia/Seoul
+    username: root
+    password: <DB_비밀번호>
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  application:
+    name: Planty
+
+adafruit:
+  api:
+    key: <ADAFRUIT_API_KEY>
+    url: https://io.adafruit.com
+    username: <ADAFRUIT_USERNAME>
+  feed:
+    key: planty.soilmoisture
+
+jwt:
+  secret: <JWT_SECRET_KEY>
+  expiration: 3600000
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui
+    operations-sorter: method
+    tags-sorter: alpha
+    display-request-duration: true
+    
+fcm:
+  firebase_config_path: firebase/<planty-firebase-adminsdk-xxx.json>
+
+```
 
 <br>
 
