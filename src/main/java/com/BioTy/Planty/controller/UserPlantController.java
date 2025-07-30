@@ -1,20 +1,24 @@
 package com.BioTy.Planty.controller;
 
+import com.BioTy.Planty.dto.environment.EnvironmentReportDto;
 import com.BioTy.Planty.dto.iot.RegisterDeviceRequestDto;
 import com.BioTy.Planty.dto.userPlant.UserPlantCreateRequestDto;
 import com.BioTy.Planty.dto.userPlant.UserPlantDetailResponseDto;
 import com.BioTy.Planty.dto.userPlant.UserPlantSummaryResponseDto;
 import com.BioTy.Planty.dto.userPlant.UserPlantEditDto;
 import com.BioTy.Planty.service.AuthService;
+import com.BioTy.Planty.service.EnvironmentReportService;
 import com.BioTy.Planty.service.UserPlantService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Tag(name = "UserPlant", description = "사용자의 반려식물 관련 API")
@@ -24,6 +28,7 @@ import java.util.List;
 public class UserPlantController {
     private final UserPlantService userPlantService;
     private final AuthService authService;
+    private final EnvironmentReportService environmentReportService;
 
     // 로그인한 사용자의 반려 식물 조회 (홈)
     @Operation(summary = "사용자의 반려식물 목록 조회",
@@ -130,4 +135,17 @@ public class UserPlantController {
         userPlantService.editUserPlant(userPlantId, userId, requestDto);
         return ResponseEntity.ok().build();
     }
+
+    @Operation(summary = "환경 리포트 조회", description = "특정 반려식물의 하루치 환경 리포트를 조회합니다.",
+            security = @SecurityRequirement(name = "bearerAuth"))
+    @GetMapping("/{userPlantId}/environment-report")
+    public ResponseEntity<EnvironmentReportDto> getEnvironmentReport(
+            @PathVariable("userPlantId") Long userPlantId,
+            @RequestParam(name = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
+    ) {
+        EnvironmentReportDto dto = environmentReportService.getReport(userPlantId, date);
+        return ResponseEntity.ok(dto);
+    }
+
+
 }
