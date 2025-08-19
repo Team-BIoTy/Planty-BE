@@ -51,7 +51,7 @@ public class IotController {
     )
     @PostMapping("/sensor-data")
     public ResponseEntity<Void> fetchSensorData(
-        @RequestParam Long deviceId
+            @RequestParam("deviceId") Long deviceId
     ){
         iotService.fetchAndSaveSensorLog(deviceId);
         return ResponseEntity.ok().build();

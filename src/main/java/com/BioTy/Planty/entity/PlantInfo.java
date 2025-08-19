@@ -66,4 +66,11 @@ public class PlantInfo {
 
     // 기능성 정보
     private String functionalInfo;
+
+    @OneToOne(mappedBy = "plantInfo", fetch = FetchType.LAZY)
+    private PlantEnvStandards plantEnvStandards;
+
+    public PlantEnvStandards getPlantEnvStandards() {
+        return this.plantEnvStandards;
+    }
 }
