@@ -1,5 +1,6 @@
 package com.BioTy.Planty.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -68,6 +69,7 @@ public class PlantInfo {
     private String functionalInfo;
 
     @OneToOne(mappedBy = "plantInfo", fetch = FetchType.LAZY)
+    @JsonIgnore
     private PlantEnvStandards plantEnvStandards;
 
     public PlantEnvStandards getPlantEnvStandards() {

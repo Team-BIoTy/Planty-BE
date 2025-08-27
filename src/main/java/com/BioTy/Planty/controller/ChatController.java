@@ -11,7 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/chats")
@@ -89,4 +91,19 @@ public class ChatController {
         );
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/qa")
+    public ResponseEntity<ChatMessageResponseDto> plantQa(
+            @RequestBody Map<String, Object> requestBody
+    ) {
+        Long chatRoomId = requestBody.containsKey("chatRoomId") ? Long.valueOf(requestBody.get("chatRoomId").toString()) : null;
+        String userInput = requestBody.get("userInput").toString();
+
+        String answer = chatService.callPlantQAAgent(chatRoomId, userInput);
+
+        ChatMessageResponseDto response = new ChatMessageResponseDto("BOT", answer, LocalDateTime.now());
+        return ResponseEntity.ok(response);
+    }
+
+
 }

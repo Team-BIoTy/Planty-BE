@@ -78,6 +78,7 @@ public class ChatService {
 
         UserPlant userPlant = chatRoom.getUserPlant(); // null일 수 있음
 
+        Long userPlantId = (userPlant != null) ? userPlant.getId() : -1L;
         String nickname = userPlant != null ? userPlant.getNickname() : "식물 챗봇";
         String imageUrl = userPlant != null ? userPlant.getImageUrl() : null;
         String personalityLabel = userPlant != null ? userPlant.getPersonality().getLabel() : null;
@@ -118,7 +119,7 @@ public class ChatService {
 
         return new ChatRoomDetailDto(
                 chatRoomId,
-                userPlant.getId(),
+                userPlantId,
                 nickname,
                 imageUrl,
                 personalityLabel,
@@ -238,4 +239,38 @@ public class ChatService {
                 botMsg.getTimestamp()
         );
     }
+
+    public String callPlantQAAgent(Long chatRoomId, String userInput) {
+        String aiServerUrl = "http://localhost:8000/plant_qa";
+
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("user_input", userInput);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
+
+        String botReply = "Agent 응답 실패";
+        try {
+            ResponseEntity<Map> response = restTemplate.postForEntity(aiServerUrl, request, Map.class);
+            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+                botReply = (String) response.getBody().get("final_response");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (chatRoomId != null) {
+            chatMessageRepository.save(new ChatMessage(chatRoomId, ChatMessage.Sender.USER, userInput));
+            chatMessageRepository.save(new ChatMessage(chatRoomId, ChatMessage.Sender.BOT, botReply));
+            chatRoomRepository.findById(chatRoomId).ifPresent(room -> {
+                room.updateLastSentAt(LocalDateTime.now());
+                chatRoomRepository.save(room);
+            });
+        }
+
+        return botReply;
+    }
+
+
 }
