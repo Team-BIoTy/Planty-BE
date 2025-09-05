@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SendMessageRequestDto {
+    private String type; // slm 또는 llm
     private String message;
     private PlantInfo plantInfo;
     private Long sensorLogId;
