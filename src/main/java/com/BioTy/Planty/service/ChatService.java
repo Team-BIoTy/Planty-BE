@@ -1,9 +1,6 @@
 package com.BioTy.Planty.service;
 
-import com.BioTy.Planty.dto.chat.ChatIdResponseDto;
-import com.BioTy.Planty.dto.chat.ChatMessageResponseDto;
-import com.BioTy.Planty.dto.chat.ChatRoomDetailDto;
-import com.BioTy.Planty.dto.chat.ChatRoomSummaryDto;
+import com.BioTy.Planty.dto.chat.*;
 import com.BioTy.Planty.entity.*;
 import com.BioTy.Planty.repository.ChatMessageRepository;
 import com.BioTy.Planty.repository.ChatRoomRepository;
@@ -135,7 +132,7 @@ public class ChatService {
 
     // 4. 메시지 전송
     public ChatMessageResponseDto sendMessage(Long chatRoomId, String message, PlantInfo info,
-                                              Long sensorLogId, Long plantEnvStandardsId, String persona) {
+                                              Long sensorLogId, Long plantEnvStandardsId, String persona, String type) {
         // 1) 사용자 메시지 저장
         ChatMessage userMsg = chatMessageRepository.save(
                 new ChatMessage(chatRoomId, ChatMessage.Sender.USER, message)
@@ -147,6 +144,7 @@ public class ChatService {
             String aiServerUrl = "http://localhost:8000/chat";
 
             Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("type", type);
             requestBody.put("chat_room_id", chatRoomId);
             requestBody.put("sensor_log_id", sensorLogId);
             requestBody.put("plant_env_standards_id", plantEnvStandardsId);
@@ -240,10 +238,11 @@ public class ChatService {
         );
     }
 
-    public String callPlantQAAgent(Long chatRoomId, String userInput) {
+    public String callPlantQAAgent(Long chatRoomId, String userInput, String type) {
         String aiServerUrl = "http://localhost:8000/plant_qa";
 
         Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("type", type);
         requestBody.put("user_input", userInput);
 
         HttpHeaders headers = new HttpHeaders();

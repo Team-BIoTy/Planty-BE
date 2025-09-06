@@ -39,8 +39,8 @@ public class DeviceCommandService {
                 LocalDateTime now = LocalDateTime.now();
                 LocalDateTime willEndAt = switch (action) {
                     case "WATER" -> now.plusSeconds(3);
-                    case "FAN" -> now.plusSeconds(30);
-                    case "LIGHT" -> now.plusSeconds(30);
+                    case "FAN" -> now.plusSeconds(15);
+                    case "LIGHT" -> now.plusSeconds(15);
                     default -> now.plusSeconds(0);
                 };
 
@@ -58,8 +58,8 @@ public class DeviceCommandService {
                 // 4. 지속시간 후 OFF
                 long delaySeconds = switch (action) {
                     case "WATER" -> 3;
-                    case "FAN" -> 30;
-                    case "LIGHT" -> 30;
+                    case "FAN" -> 15;
+                    case "LIGHT" -> 15;
                     default -> 0;
                 };
 

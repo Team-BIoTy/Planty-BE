@@ -87,7 +87,8 @@ public class ChatController {
                 request.getPlantInfo(),
                 request.getSensorLogId(),
                 request.getPlantEnvStandardsId(),
-                request.getPersona()
+                request.getPersona(),
+                request.getType()
         );
         return ResponseEntity.ok(response);
     }
@@ -98,8 +99,9 @@ public class ChatController {
     ) {
         Long chatRoomId = requestBody.containsKey("chatRoomId") ? Long.valueOf(requestBody.get("chatRoomId").toString()) : null;
         String userInput = requestBody.get("userInput").toString();
+        String type = requestBody.get("type").toString();
 
-        String answer = chatService.callPlantQAAgent(chatRoomId, userInput);
+        String answer = chatService.callPlantQAAgent(chatRoomId, userInput, type);
 
         ChatMessageResponseDto response = new ChatMessageResponseDto("BOT", answer, LocalDateTime.now());
         return ResponseEntity.ok(response);
