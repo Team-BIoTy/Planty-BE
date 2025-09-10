@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 
 import java.io.IOException;
 
@@ -23,8 +25,15 @@ public class FirebaseConfig {
     @PostConstruct
     public void initialize() throws IOException {
         try {
+            Resource resource;
+            if (firebaseConfigPath.startsWith("/") || firebaseConfigPath.startsWith("file:")) {
+                resource = new FileSystemResource(firebaseConfigPath);
+            } else {
+                resource = new ClassPathResource(firebaseConfigPath);
+            }
+
             GoogleCredentials googleCredentials = GoogleCredentials
-                    .fromStream(new ClassPathResource(firebaseConfigPath).getInputStream());
+                    .fromStream(resource.getInputStream());
             FirebaseOptions options = new FirebaseOptions.Builder()
                     .setCredentials(googleCredentials)
                     .build();
