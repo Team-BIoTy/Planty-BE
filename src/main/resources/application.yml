@@ -38,3 +38,6 @@ springdoc:
 
 fcm:
   firebase_config_path: ${FIREBASE_CONFIG_PATH}
+
+agent:
+  base-url: ${AGENT_URL}

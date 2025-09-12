@@ -7,6 +7,7 @@ import com.BioTy.Planty.repository.ChatRoomRepository;
 import com.BioTy.Planty.repository.PlantEnvStandardsRepository;
 import com.BioTy.Planty.repository.SensorLogsRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
@@ -27,6 +28,9 @@ public class ChatService {
     private final ChatMessageRepository chatMessageRepository;
     private final SensorLogsRepository sensorLogsRepository;
     private final PlantEnvStandardsRepository plantEnvStandardsRepository;
+
+    @Value("${agent.base-url}")
+    private String aiServerBaseUrl;
 
     private final RestTemplate restTemplate = new RestTemplate();
 
@@ -141,7 +145,7 @@ public class ChatService {
         // 2) Agent 서버 호출
         String botReply = "기본 응답입니다 (Agent 연결 실패)";
         try {
-            String aiServerUrl = "http://localhost:8000/chat";
+            String aiServerUrl = aiServerBaseUrl + "/chat";
 
             Map<String, Object> requestBody = new HashMap<>();
             requestBody.put("type", type);
@@ -239,7 +243,9 @@ public class ChatService {
     }
 
     public String callPlantQAAgent(Long chatRoomId, String userInput, String type) {
-        String aiServerUrl = "http://localhost:8000/plant_qa";
+
+
+        String aiServerUrl = aiServerBaseUrl + "/plant_qa";
 
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("type", type);
