@@ -26,7 +26,7 @@ public class SensorFetchScheduler {
     private final UserPlantRepository userPlantRepository;
     private final UserDeviceTokenRepository userDeviceTokenRepository;
 
-    @Scheduled(cron = "0 0 * * * *") // 매시 정각마다
+    @Scheduled(cron = "0 0 * * * *", zone = "Asia/Seoul") // 매시 정각마다
     public void fetchSensorDataEveryHour() {
         List<UserPlant> allPlants = userPlantRepository.findAll();
 
