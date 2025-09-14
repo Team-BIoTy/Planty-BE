@@ -19,15 +19,11 @@ spring:
 
 adafruit:
   api:
-    key: ${ADAFRUIT_API_KEY}
     url: https://io.adafruit.com
-    username: ${ADAFRUIT_USERNAME}
-  feed:
-    key: ${ADAFRUIT_FEED_KEY}
 
 jwt:
   secret: ${JWT_SECRET}
-  expiration: ${JWT_EXPIRATION:3600000}   # 기본값 1시간
+  expiration: ${JWT_EXPIRATION:604800000}   # 기본값 7일
 
 springdoc:
   swagger-ui:
@@ -41,3 +37,6 @@ fcm:
 
 agent:
   base-url: ${AGENT_URL}
+
+encryption:
+  secret: ${ENCRYPTION_SECRET_KEY}

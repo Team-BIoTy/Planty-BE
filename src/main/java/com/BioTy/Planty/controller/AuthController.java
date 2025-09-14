@@ -1,9 +1,6 @@
 package com.BioTy.Planty.controller;
 
-import com.BioTy.Planty.dto.user.ChangePasswordRequestDto;
-import com.BioTy.Planty.dto.user.LoginRequestDto;
-import com.BioTy.Planty.dto.user.LoginResponseDto;
-import com.BioTy.Planty.dto.user.SignupRequestDto;
+import com.BioTy.Planty.dto.user.*;
 import com.BioTy.Planty.entity.User;
 import com.BioTy.Planty.security.JwtUtil;
 import com.BioTy.Planty.service.AuthService;
@@ -117,5 +114,17 @@ public class AuthController {
         return ResponseEntity.ok(result);
     }
 
+    @Operation(summary = "Adafruit 계정 등록 및 수정", description = "Adafruit username과 apiKey를 등록/수정합니다.",
+            security = @SecurityRequirement(name = "bearerAuth"))
+    @PutMapping("/adafruit")
+    public ResponseEntity<?> updateAdafruitAccount(
+            @RequestHeader("Authorization") String token,
+            @RequestBody UpdateAdafruitAccountDto request
+    ) {
+        token = token.replace("Bearer ", "");
+        Long userId = authService.getUserIdFromToken(token);
+        authService.updateAdafruitAccount(userId, request.getUsername(), request.getApiKey());
+        return ResponseEntity.ok("Adafruit 계정이 업데이트되었습니다.");
+    }
 
 }

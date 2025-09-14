@@ -3,20 +3,27 @@ package com.BioTy.Planty.service;
 import com.BioTy.Planty.dto.user.LoginRequestDto;
 import com.BioTy.Planty.dto.user.LoginResponseDto;
 import com.BioTy.Planty.dto.user.SignupRequestDto;
+import com.BioTy.Planty.entity.IotDevice;
 import com.BioTy.Planty.entity.User;
+import com.BioTy.Planty.repository.IotRepository;
 import com.BioTy.Planty.repository.UserRepository;
+import com.BioTy.Planty.security.EncryptionUtil;
 import com.BioTy.Planty.security.JwtUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
     private final UserRepository userRepository;
+    private final IotRepository iotRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final EncryptionUtil encryptionUtil;
 
     // 1. 회원가입 메서드
     public void signup(SignupRequestDto signupRequestDto) {
@@ -77,6 +84,27 @@ public class AuthService {
     public User getUserInfo(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+    }
+
+    @Transactional
+    public void updateAdafruitAccount(Long userId, String username, String apiKey) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        String encryptedApiKey = encryptionUtil.encrypt(apiKey);
+        user.updateAdafruitAccount(username, encryptedApiKey);
+
+        userRepository.save(user);
+
+        if (user.getIotDevices().isEmpty()) {
+            IotDevice device = new IotDevice();
+            device.setUser(user);
+            device.setDeviceSerial(UUID.randomUUID().toString()); // 임시 시리얼
+            device.setModel("Adafruit-Default");
+            device.setStatus("ACTIVE");
+            device.setFeedKey("planty");
+            iotRepository.save(device);
+        }
     }
 
 }

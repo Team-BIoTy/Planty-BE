@@ -9,6 +9,7 @@ import com.BioTy.Planty.entity.UserPlant;
 import com.BioTy.Planty.repository.IotRepository;
 import com.BioTy.Planty.repository.SensorLogsRepository;
 import com.BioTy.Planty.repository.UserPlantRepository;
+import com.BioTy.Planty.security.EncryptionUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +29,7 @@ public class IotService {
     private final UserPlantRepository userPlantRepository;
     private final AdafruitClient adafruitClient;
     private final SensorLogsRepository sensorLogsRepository;
+    private final EncryptionUtil encryptionUtil;
 
     public List<IotDeviceResponseDto> getDevicesByUserId(Long userId){
         return iotRepository.findAllByUserId(userId).stream()
@@ -36,16 +38,19 @@ public class IotService {
     }
 
     public void fetchAndSaveSensorLog(Long deviceId) {
+        IotDevice device = iotRepository.findById(deviceId)
+                .orElseThrow(() -> new RuntimeException("기기를 찾을 수 없습니다."));
+
+        String username = device.getUser().getAdafruitUsername();
+        String apiKey = encryptionUtil.decrypt(device.getUser().getAdafruitApiKey());
+
         String lightKey = "planty.lightintensity";
         String tempKey = "planty.temperature";
         String humidKey = "planty.soilmoisture";
 
-        SensorLogResponseDto light = adafruitClient.fetchFeedInfo(lightKey);
-        SensorLogResponseDto temperature = adafruitClient.fetchFeedInfo(tempKey);
-        SensorLogResponseDto humidity = adafruitClient.fetchFeedInfo(humidKey);
-
-        IotDevice device = iotRepository.findById(deviceId)
-                .orElseThrow(() -> new RuntimeException("기기를 찾을 수 없습니다."));
+        SensorLogResponseDto light = adafruitClient.fetchFeedInfo(username, apiKey, lightKey);
+        SensorLogResponseDto temperature = adafruitClient.fetchFeedInfo(username, apiKey, tempKey);
+        SensorLogResponseDto humidity = adafruitClient.fetchFeedInfo(username, apiKey, humidKey);
 
         BigDecimal lightVal = new BigDecimal(light.getLastValue());
         BigDecimal temperatureVal = new BigDecimal(temperature.getLastValue());
@@ -73,29 +78,32 @@ public class IotService {
             throw new RuntimeException("해당 식물에 대한 권한이 없습니다.");
         }
 
-        Long deviceId = userPlant.getIotDevice().getId();
+        IotDevice device = userPlant.getIotDevice();
+        String username = userPlant.getUser().getAdafruitUsername();
+        String apiKey = encryptionUtil.decrypt(userPlant.getUser().getAdafruitApiKey());
+
         String timestamp = LocalDateTime.now()
                 .format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
 
         switch (actionType.toUpperCase()) {
-            case "WATER_ON" -> adafruitClient.sendCommand("action.water", "ON");
-            case "WATER_OFF" -> adafruitClient.sendCommand("action.water", "OFF");
+            case "WATER_ON" -> adafruitClient.sendCommand(username, apiKey, "action.water", "ON");
+            case "WATER_OFF" -> adafruitClient.sendCommand(username, apiKey, "action.water", "OFF");
 
-            case "FAN_ON" -> adafruitClient.sendCommand("action.fan", "ON");
-            case "FAN_OFF" -> adafruitClient.sendCommand("action.fan", "OFF");
+            case "FAN_ON" -> adafruitClient.sendCommand(username, apiKey, "action.fan", "ON");
+            case "FAN_OFF" -> adafruitClient.sendCommand(username, apiKey, "action.fan", "OFF");
 
-            case "LIGHT_ON" -> adafruitClient.sendCommand("action.light", "ON");
-            case "LIGHT_OFF" -> adafruitClient.sendCommand("action.light", "OFF");
+            case "LIGHT_ON" -> adafruitClient.sendCommand(username, apiKey, "action.light", "ON");
+            case "LIGHT_OFF" -> adafruitClient.sendCommand(username, apiKey, "action.light", "OFF");
 
             case "REFRESH" -> {
-                String value = deviceId + "_" + timestamp;
-                adafruitClient.sendCommand("action.refresh", value);
+                String value = device.getId() + "_" + timestamp;
+                adafruitClient.sendCommand(username, apiKey, "action.refresh", value);
                 try {
                     Thread.sleep(3000); // 3초 정도 대기
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
-                fetchAndSaveSensorLog(deviceId);
+                fetchAndSaveSensorLog(device.getId());
             }
             default -> throw new IllegalArgumentException("지원하지 않는 명령입니다." + actionType);
         }
