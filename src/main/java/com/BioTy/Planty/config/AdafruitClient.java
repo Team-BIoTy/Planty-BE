@@ -20,15 +20,9 @@ public class AdafruitClient {
     @Value("${adafruit.api.url}")
     private String baseUrl;
 
-    @Value("${adafruit.api.username}")
-    private String username;
-
-    @Value("${adafruit.api.key}")
-    private String apiKey;
-
     private final RestTemplate restTemplate;
 
-    public SensorLogResponseDto fetchFeedInfo(String feedKey){
+    public SensorLogResponseDto fetchFeedInfo(String username, String apiKey, String feedKey){
         String url = String.format("%s/api/v2/%s/feeds/%s", baseUrl, username, feedKey);
 
         HttpHeaders headers = new HttpHeaders();
@@ -38,7 +32,7 @@ public class AdafruitClient {
         return restTemplate.exchange(url, HttpMethod.GET, request, SensorLogResponseDto.class).getBody();
     }
 
-    public void sendCommand(String feedKey, String value){
+    public void sendCommand(String username, String apiKey, String feedKey, String value){
         String url = String.format("%s/api/v2/%s/feeds/%s/data", baseUrl, username, feedKey);
 
         HttpHeaders headers = new HttpHeaders();
