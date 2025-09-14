@@ -19,6 +19,11 @@ public class IotDevice {
     private String deviceSerial;
     private String model;
     private String status;
+    private String feedKey;
+
+    public void setFeedKey(String feedKey) {
+        this.feedKey = feedKey;
+    }
 
     @OneToOne(mappedBy = "iotDevice")
     private UserPlant userPlant;

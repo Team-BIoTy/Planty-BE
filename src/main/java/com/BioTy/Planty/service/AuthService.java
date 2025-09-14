@@ -3,7 +3,9 @@ package com.BioTy.Planty.service;
 import com.BioTy.Planty.dto.user.LoginRequestDto;
 import com.BioTy.Planty.dto.user.LoginResponseDto;
 import com.BioTy.Planty.dto.user.SignupRequestDto;
+import com.BioTy.Planty.entity.IotDevice;
 import com.BioTy.Planty.entity.User;
+import com.BioTy.Planty.repository.IotRepository;
 import com.BioTy.Planty.repository.UserRepository;
 import com.BioTy.Planty.security.JwtUtil;
 import jakarta.transaction.Transactional;
@@ -11,10 +13,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
     private final UserRepository userRepository;
+    private final IotRepository iotRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
@@ -85,6 +90,16 @@ public class AuthService {
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
         user.updateAdafruitAccount(username, apiKey);
         userRepository.save(user);
+
+        if (user.getIotDevices().isEmpty()) {
+            IotDevice device = new IotDevice();
+            device.setUser(user);
+            device.setDeviceSerial(UUID.randomUUID().toString()); // 임시 시리얼
+            device.setModel("Adafruit-Default");
+            device.setStatus("ACTIVE");
+            device.setFeedKey("planty");
+            iotRepository.save(device);
+        }
     }
 
 }
