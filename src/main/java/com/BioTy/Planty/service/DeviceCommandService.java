@@ -55,14 +55,12 @@ public class DeviceCommandService {
                         .commandType(action)
                         .sentAt(now)
                         .status("RUNNING")
-                        .willBeTurnedOffAt(duration > 0 ? willEndAt : null)
+                        .willBeTurnedOffAt(willEndAt)
                         .build();
                 commandRepository.save(command);
 
                 // 4. OFF + REFRESH 예약
-                if (duration > 0) {
-                    scheduleOffAndRefresh(command, username, apiKey, deviceId, duration);
-                }
+                scheduleOffAndRefresh(command, username, apiKey, deviceId, duration);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -74,7 +72,7 @@ public class DeviceCommandService {
         return switch (action) {
             case "WATER" -> 6;
             case "FAN" -> 10;
-            case "LIGHT" -> 0;
+            case "LIGHT" -> 15;
             default -> 0;
         };
     }
