@@ -49,6 +49,9 @@ public class UserPlant {
     @JoinColumn(name = "iot_device_id")
     private IotDevice iotDevice;
 
+    @OneToMany(mappedBy = "userPlant", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<UserNotification> userNotifications = new ArrayList<>();
+
     public PlantStatus getLatestStatus(){
         return statuses.stream()
                 .max(Comparator.comparing(PlantStatus::getCheckedAt))
