@@ -26,6 +26,12 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = true)
+    private String adafruitUsername;
+
+    @Column(nullable = true)
+    private String adafruitApiKey;
+
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;
@@ -50,5 +56,10 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public void updateAdafruitAccount(String username, String apiKey) {
+        this.adafruitUsername = username;
+        this.adafruitApiKey = apiKey;
     }
 }

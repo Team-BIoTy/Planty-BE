@@ -79,4 +79,12 @@ public class AuthService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
     }
 
+    @Transactional
+    public void updateAdafruitAccount(Long userId, String username, String apiKey) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        user.updateAdafruitAccount(username, apiKey);
+        userRepository.save(user);
+    }
+
 }
