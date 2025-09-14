@@ -9,6 +9,7 @@ import com.BioTy.Planty.entity.UserPlant;
 import com.BioTy.Planty.repository.IotRepository;
 import com.BioTy.Planty.repository.SensorLogsRepository;
 import com.BioTy.Planty.repository.UserPlantRepository;
+import com.BioTy.Planty.security.EncryptionUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +29,7 @@ public class IotService {
     private final UserPlantRepository userPlantRepository;
     private final AdafruitClient adafruitClient;
     private final SensorLogsRepository sensorLogsRepository;
+    private final EncryptionUtil encryptionUtil;
 
     public List<IotDeviceResponseDto> getDevicesByUserId(Long userId){
         return iotRepository.findAllByUserId(userId).stream()
@@ -40,7 +42,7 @@ public class IotService {
                 .orElseThrow(() -> new RuntimeException("기기를 찾을 수 없습니다."));
 
         String username = device.getUser().getAdafruitUsername();
-        String apiKey = device.getUser().getAdafruitApiKey();
+        String apiKey = encryptionUtil.decrypt(device.getUser().getAdafruitApiKey());
 
         String lightKey = "planty.lightintensity";
         String tempKey = "planty.temperature";
@@ -78,9 +80,8 @@ public class IotService {
 
         IotDevice device = userPlant.getIotDevice();
         String username = userPlant.getUser().getAdafruitUsername();
-        String apiKey = userPlant.getUser().getAdafruitApiKey();
+        String apiKey = encryptionUtil.decrypt(userPlant.getUser().getAdafruitApiKey());
 
-//        Long deviceId = userPlant.getIotDevice().getId();
         String timestamp = LocalDateTime.now()
                 .format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
 
