@@ -3,6 +3,7 @@ package com.BioTy.Planty.service;
 import com.BioTy.Planty.entity.DeviceCommand;
 import com.BioTy.Planty.entity.UserPlant;
 import com.BioTy.Planty.repository.DeviceCommandRepository;
+import com.BioTy.Planty.security.EncryptionUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,32 +20,35 @@ public class DeviceCommandService {
     private final IotService iotService;
     private final DeviceCommandRepository commandRepository;
     private final ScheduledExecutorService commandScheduler;
-    private final PlantStatusService plantStatusService;
+    private final EncryptionUtil encryptionUtil;
 
     public void executeCommands(UserPlant userPlant, List<String> actionTypes) {
+        Long userPlantId = userPlant.getId();
+        Long userId = userPlant.getUser().getId();
+        String username = userPlant.getUser().getAdafruitUsername();
+        String apiKey = encryptionUtil.decrypt(userPlant.getUser().getAdafruitApiKey());
+        Long deviceId = userPlant.getIotDevice().getId();
+
         for (String actionType : actionTypes) {
             try {
                 String action = actionType.toUpperCase();
+
+                // REFRESH 바로 실행
                 if (action.equals("REFRESH")) {
-                    iotService.sendCommandToAdafruit(userPlant.getId(), userPlant.getUser().getId(), "REFRESH");
+                    iotService.sendCommandToAdafruit("REFRESH", username, apiKey, deviceId);
                     continue;
                 }
-                String onAction = action + "_ON";
-                String offAction = action + "_OFF";
 
                 // 1. 명령 전송
-                iotService.sendCommandToAdafruit(userPlant.getId(), userPlant.getUser().getId(), onAction);
+                String onAction = action + "_ON";
+                iotService.sendCommandToAdafruit(onAction, username, apiKey, deviceId);
 
-                // 2. 명령 지속시간 계산
+                // 2. 지속시간 계산
+                long duration = getDurationSeconds(action);
                 LocalDateTime now = LocalDateTime.now();
-                LocalDateTime willEndAt = switch (action) {
-                    case "WATER" -> now.plusSeconds(6);
-                    case "FAN" -> now.plusSeconds(10);
-                    case "LIGHT" -> now.plusSeconds(10);
-                    default -> now.plusSeconds(0);
-                };
+                LocalDateTime willEndAt = now.plusSeconds(duration);
 
-                // 3. 전송한 명령 기록 (device_command)
+                // 3. 명령 기록
                 DeviceCommand command = DeviceCommand.builder()
                         .iotDevice(userPlant.getIotDevice())
                         .userPlant(userPlant)
@@ -55,45 +59,55 @@ public class DeviceCommandService {
                         .build();
                 commandRepository.save(command);
 
-                // 4. 지속시간 후 OFF
-                long delaySeconds = switch (action) {
-                    case "WATER" -> 6;
-                    case "FAN" -> 10;
-                    case "LIGHT" -> 10;
-                    default -> 0;
-                };
-
-                commandScheduler.schedule(() -> {
-                    try {
-                        // OFF 명령 전송
-                        iotService.sendCommandToAdafruit(userPlant.getId(), userPlant.getUser().getId(), offAction);
-                        // 상태 변경
-                        command.setStatus("DONE");
-                        commandRepository.save(command);
-                        // OFF 이후 10초 뒤 센서 재수집 & 상태 재평가
-                        commandScheduler.schedule(() -> {
-                            try {
-                                iotService.sendCommandToAdafruit(
-                                        userPlant.getId(),
-                                        userPlant.getUser().getId(),
-                                        "REFRESH"
-                                );
-                                iotService.fetchAndSaveSensorLog(userPlant.getIotDevice().getId());
-                                plantStatusService.evaluatePlantStatus(userPlant.getIotDevice().getId());
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }, 10, TimeUnit.SECONDS);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }, delaySeconds, TimeUnit.SECONDS);
+                // 4. OFF + REFRESH 예약
+                scheduleOffAndRefresh(command, username, apiKey, deviceId, duration);
 
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
+
+    private long getDurationSeconds(String action) {
+        return switch (action) {
+            case "WATER" -> 6;
+            case "FAN" -> 10;
+            case "LIGHT" -> 10;
+            default -> 0;
+        };
+    }
+
+    private void scheduleOffAndRefresh(
+            DeviceCommand command, String username, String apiKey, Long deviceId,
+            long delaySeconds
+    ) {
+        String offAction = command.getCommandType() + "_OFF";
+
+        commandScheduler.schedule(() -> {
+            try {
+                // OFF
+                iotService.sendCommandToAdafruit(offAction, username, apiKey, deviceId);
+
+                // 상태 DONE 업데이트
+                DeviceCommand latest = commandRepository.findById(command.getId()).orElseThrow();
+                latest.setStatus("DONE");
+                commandRepository.save(latest);
+
+                // REFRESH 예약 (10초 뒤)
+                commandScheduler.schedule(() -> {
+                    try {
+                        iotService.sendCommandToAdafruit("REFRESH", username, apiKey, deviceId);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }, 10, TimeUnit.SECONDS);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }, delaySeconds, TimeUnit.SECONDS);
+    }
+
     @Transactional
     public void cancelCommand(Long commandId, Long userId) {
         DeviceCommand command = commandRepository.findById(commandId)

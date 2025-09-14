@@ -108,4 +108,36 @@ public class IotService {
             default -> throw new IllegalArgumentException("지원하지 않는 명령입니다." + actionType);
         }
     }
+
+    public void sendCommandToAdafruit(
+            String actionType, String username, String apiKey, Long deviceId
+    ) {
+        String timestamp = LocalDateTime.now()
+                .format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+
+        switch (actionType.toUpperCase()) {
+            case "WATER_ON" -> adafruitClient.sendCommand(username, apiKey, "action.water", "ON");
+            case "WATER_OFF" -> adafruitClient.sendCommand(username, apiKey, "action.water", "OFF");
+
+            case "FAN_ON" -> adafruitClient.sendCommand(username, apiKey, "action.fan", "ON");
+            case "FAN_OFF" -> adafruitClient.sendCommand(username, apiKey, "action.fan", "OFF");
+
+            case "LIGHT_ON" -> adafruitClient.sendCommand(username, apiKey, "action.light", "ON");
+            case "LIGHT_OFF" -> adafruitClient.sendCommand(username, apiKey, "action.light", "OFF");
+
+            case "REFRESH" -> {
+                String value = deviceId + "_" + timestamp;
+                adafruitClient.sendCommand(username, apiKey, "action.refresh", value);
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                fetchAndSaveSensorLog(deviceId);
+            }
+
+            default -> throw new IllegalArgumentException("지원하지 않는 명령입니다." + actionType);
+        }
+    }
+
 }
