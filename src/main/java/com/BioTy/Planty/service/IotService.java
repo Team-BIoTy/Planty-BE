@@ -10,6 +10,7 @@ import com.BioTy.Planty.repository.IotRepository;
 import com.BioTy.Planty.repository.SensorLogsRepository;
 import com.BioTy.Planty.repository.UserPlantRepository;
 import com.BioTy.Planty.security.EncryptionUtil;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +38,7 @@ public class IotService {
                 .toList();
     }
 
+    @Transactional
     public void fetchAndSaveSensorLog(Long deviceId) {
         IotDevice device = iotRepository.findById(deviceId)
                 .orElseThrow(() -> new RuntimeException("기기를 찾을 수 없습니다."));
