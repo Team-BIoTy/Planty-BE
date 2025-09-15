@@ -5,6 +5,7 @@ import com.BioTy.Planty.dto.iot.IotDeviceResponseDto;
 import com.BioTy.Planty.dto.iot.SensorLogResponseDto;
 import com.BioTy.Planty.entity.IotDevice;
 import com.BioTy.Planty.entity.SensorLogs;
+import com.BioTy.Planty.entity.User;
 import com.BioTy.Planty.entity.UserPlant;
 import com.BioTy.Planty.repository.IotRepository;
 import com.BioTy.Planty.repository.SensorLogsRepository;
@@ -40,11 +41,12 @@ public class IotService {
 
     @Transactional
     public void fetchAndSaveSensorLog(Long deviceId) {
-        IotDevice device = iotRepository.findById(deviceId)
+        IotDevice device = iotRepository.findByIdWithUser(deviceId)
                 .orElseThrow(() -> new RuntimeException("기기를 찾을 수 없습니다."));
 
-        String username = device.getUser().getAdafruitUsername();
-        String apiKey = encryptionUtil.decrypt(device.getUser().getAdafruitApiKey());
+        User user = device.getUser();
+        String username = user.getAdafruitUsername();
+        String apiKey = encryptionUtil.decrypt(user.getAdafruitApiKey());
 
         String lightKey = "planty.lightintensity";
         String tempKey = "planty.temperature";
