@@ -71,8 +71,8 @@ public class DeviceCommandService {
     private long getDurationSeconds(String action) {
         return switch (action) {
             case "WATER" -> 15;
-            case "FAN" -> 10;
-            case "LIGHT" -> 15;
+            case "FAN" -> 30;
+            case "LIGHT" -> 30;
             default -> 0;
         };
     }
