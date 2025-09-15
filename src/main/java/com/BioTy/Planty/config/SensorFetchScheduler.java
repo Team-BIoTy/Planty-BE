@@ -28,7 +28,7 @@ public class SensorFetchScheduler {
 
     @Scheduled(cron = "0 0 * * * *", zone = "Asia/Seoul") // 매시 정각마다
     public void fetchSensorDataEveryHour() {
-        List<UserPlant> allPlants = userPlantRepository.findAll();
+        List<UserPlant> allPlants = userPlantRepository.findAllWithUserAndDevice();
 
         for (UserPlant plant : allPlants) {
             if (plant.getIotDevice() == null) continue;
